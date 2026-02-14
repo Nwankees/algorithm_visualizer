@@ -1,5 +1,6 @@
 package util;
 
+// TODO: Writes counter
 public class Counters {
     private long comparisons;
     private long swaps;

@@ -4,6 +4,7 @@ import model.ArrayState;
 import steps.Step;
 import steps.StepType;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class StepRunner{
@@ -12,10 +13,10 @@ public class StepRunner{
     private ArrayState state;
     private int index;
 
-    public StepRunner(int[] initalData, List<Step> steps) {
-        this.initialData = initalData;
+    public StepRunner(int[] initialData, List<Step> steps) {
+        this.initialData = Arrays.copyOf(initialData, initialData.length);
         this.steps = steps;
-        state = new ArrayState(this.initialData);
+        state = new ArrayState(Arrays.copyOf(initialData, initialData.length));
         index = 0;
     }
 
@@ -52,9 +53,9 @@ public class StepRunner{
     }
 
     public void reset() {
-        this.state = new ArrayState(this.initialData);
-        this.state.getCounters().reset();
-        this.state.resetHighlights();
+        this.state = new ArrayState(Arrays.copyOf(this.initialData, this.initialData.length));
+//        this.state.getCounters().reset();
+//        this.state.resetHighlights(); Because reinstantiating state already resets the counters and highlights
         this.index = 0;
     }
 
