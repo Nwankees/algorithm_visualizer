@@ -1,5 +1,6 @@
 package app.ui;
 
+import algo.InsertionSortGenerator;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -12,6 +13,7 @@ import util.StepRunner;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class MainController {
     @FXML
@@ -38,7 +40,8 @@ public class MainController {
 
     public void onLoad() {
         System.out.println("Loaded!");
-        this.initDemo();
+//        this.initDemo();
+        this.LoadInsertionSortDemo(20);
     }
     public void onReset() {
         if (runner == null) {
@@ -110,6 +113,15 @@ public class MainController {
         demoSteps.add(new HighlightStep(4, 6));
         demoSteps.add(new CompareStep(4, 6));
         runner = new StepRunner(demo, demoSteps);
+        render();
+    }
+
+    private void LoadInsertionSortDemo(int arraySize) {
+        int[] data = new Random().ints(arraySize, 1, 101).toArray();
+        ArrayState temp = new ArrayState(data);
+        InsertionSortGenerator generator = new InsertionSortGenerator();
+        List<Step> steps = generator.generate(temp);
+        runner = new StepRunner(data, steps);
         render();
     }
 }
