@@ -21,18 +21,20 @@ public class InsertionSortGenerator implements StepGenerator {
         steps = new ArrayList<>();
 
         for (int i=1; i < work.length; i++) {
+            int temp = work[i];
             int j = i;
-            if (work[j] < work[j - 1]) {
-                int temp = work[j];
-                while (j > 0 && temp < work[j - 1]) {
-                    steps.add(new CompareStep(j, j - 1));
-                    work[j] = work[j - 1];
-                    steps.add(new SetValueStep(j, 0));
-                    steps.add(new SetValueStep(j, work[j - 1]));
-                    j--;
-                }
-                work[j] = temp;
-                steps.add(new SetValueStep(j, temp));
+            if (work[j - 1] < work[j]) {
+                steps.add(new CompareStep(j - 1, j));
+            }
+            while (j > 0 && temp < work[j - 1]) {
+                steps.add(new CompareStep(j, j - 1));
+
+                int swapTemp = work[j];
+                work[j] = work[j - 1];
+                work[j - 1] = swapTemp;
+
+                steps.add(new SwapStep(j, j - 1));
+                j--;
             }
         }
 
