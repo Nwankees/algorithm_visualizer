@@ -3,6 +3,15 @@ package app.ui;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+import model.ArrayState;
+import steps.*;
+import util.StepRunner;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainController {
     @FXML
@@ -23,23 +32,84 @@ public class MainController {
     private Label lblSwaps;
     @FXML
     private Label lblStepCount;
+    @FXML
+    private Pane renderPane;
+    private StepRunner runner;
 
     public void onLoad() {
-        System.out.println("Loaded!");;
+        System.out.println("Loaded!");
+        this.initDemo();
     }
     public void onReset() {
-        System.out.println("Reset!");
+        if (runner == null) {
+            System.out.println("Load array first!");
+            return;
+        }
+        runner.reset();
+        render();
     }
     public void onPrev() {
-        System.out.println("Previous!");
+        if (runner == null) {
+            System.out.println("Load array first!");
+            return;
+        }
+        runner.prev();
+        render();
     }
     public void onNext() {
-        System.out.println("Next!");
+        if (runner == null) {
+            System.out.println("Load array first!");
+            return;
+        }
+        runner.next();
+        render();
     }
     public void onPlay() {
         System.out.println("Played!");
     }
     public void onPause() {
         System.out.println("Paused!");
+    }
+
+    public void drawRectangle(double x, double y, double width, double height, Color color, Pane drawingPane) {
+        Rectangle rectangle = new Rectangle(x, y, width, height);
+        rectangle.setFill(color);
+        drawingPane.getChildren().add(rectangle);
+    }
+
+    private void render() {
+        ArrayState state = runner.getState();
+        renderPane.getChildren().clear();
+        double x = 0;
+        double width = 40;
+        for (int i = 0; i < state.getData().length; i++) {
+            x += width;
+            double height = state.get(i) * 10;
+            double y = renderPane.getHeight() - height;
+            if (i == state.getHighlightA() | i == state.getHighlightB()) {
+                Color color = Color.RED;
+                drawRectangle(x, y, width, height, color, renderPane);
+            }
+            else {
+                Color color = Color.BLACK;
+                drawRectangle(x, y, width, height, color, renderPane);
+            }
+        }
+        lblComparisons.setText("Comparisons: " + state.getCounters().getComparisons());
+        lblSwaps.setText("Swaps: " + state.getCounters().getSwaps());
+        lblStepCount.setText("Steps: " + runner.getIndex() + " / " + runner.getTotalSteps());
+    }
+
+    private void initDemo() {
+        int[] demo = {4, 2, 7, 1, 8, 3, 9, 5, 10, 6};
+        List<Step> demoSteps = new ArrayList<>();
+        demoSteps.add(new CompareStep(2, 8));
+        demoSteps.add(new SwapStep(2, 8));
+        demoSteps.add(new SwapStep(8, 2));
+        demoSteps.add(new SetValueStep(9, 30));
+        demoSteps.add(new HighlightStep(4, 6));
+        demoSteps.add(new CompareStep(4, 6));
+        runner = new StepRunner(demo, demoSteps);
+        render();
     }
 }
