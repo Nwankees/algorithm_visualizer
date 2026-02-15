@@ -1,19 +1,25 @@
 package app.ui;
 
 import algo.InsertionSortGenerator;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.util.Duration;
 import model.ArrayState;
 import steps.*;
 import util.StepRunner;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 public class MainController {
     @FXML
@@ -35,13 +41,15 @@ public class MainController {
     @FXML
     private Label lblStepCount;
     @FXML
+    private Label lblStatus;
+    @FXML
     private Pane renderPane;
     private StepRunner runner;
 
     public void onLoad() {
         System.out.println("Loaded!");
 //        this.initDemo();
-        this.LoadInsertionSortDemo(20);
+        this.LoadInsertionSortDemo(5);
     }
     public void onReset() {
         if (runner == null) {
@@ -56,20 +64,32 @@ public class MainController {
             System.out.println("Load array first!");
             return;
         }
-        runner.prev();
-        render();
+        if (runner.hasPrev()) {
+            runner.prev();
+            render();
+            if (Objects.equals(lblStatus.getText(), "Sorted ✅")) {
+                lblStatus.setText("Not sorted ❌");
+            }
+        }
     }
     public void onNext() {
         if (runner == null) {
             System.out.println("Load array first!");
             return;
         }
-        runner.next();
-        render();
+        if (runner.hasNext()) {
+            runner.next();
+            render();
+            if (!runner.hasNext()) {
+                if (StepRunner.isSorted(runner.getState().getData())) {
+                    lblStatus.setText("Sorted ✅");
+                }
+            }
+        }
     }
     public void onPlay() {
-        System.out.println("Played!");
     }
+
     public void onPause() {
         System.out.println("Paused!");
     }
