@@ -17,7 +17,7 @@ public class InsertionSortGenerator implements StepGenerator {
 
     @Override
     public List<Step> generate(ArrayState initialState) {
-        work = Arrays.copyOf(initialState.getData(), initialState.getData().length);
+        work = Arrays.copyOf(initialState.getData(), initialState.length());
         steps = new ArrayList<>();
 
         for (int i=1; i < work.length; i++) {

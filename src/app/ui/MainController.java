@@ -1,11 +1,16 @@
 package app.ui;
 
+import algo.BubbleSortGenerator;
 import algo.InsertionSortGenerator;
+import algo.MergeSortGenerator;
+import algo.StepGenerator;
+import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -15,6 +20,8 @@ import model.ArrayState;
 import steps.*;
 import util.StepRunner;
 
+import java.sql.SQLOutput;
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -43,14 +50,30 @@ public class MainController {
     @FXML
     private Label lblStatus;
     @FXML
+    private Label lblWrites;
+    @FXML
+    private Label lblNoOps;
+    @FXML
     private Pane renderPane;
+    @FXML
+    private ComboBox<String> cmbAlgorithm;
     private StepRunner runner;
+    private Timeline timeline;
+
+    public void initialize() {
+        cmbAlgorithm.getItems().addAll("Insertion Sort", "Merge Sort", "Bubble Sort");
+
+        cmbAlgorithm.getSelectionModel().selectFirst();
+    }
 
     public void onLoad() {
         System.out.println("Loaded!");
 //        this.initDemo();
-        this.LoadInsertionSortDemo(5);
+//        this.LoadInsertionSortDemo(5);
+        this.lblStatus.setText("Not sorted ❌");
+        this.LoadSelectedSortDemo(10);
     }
+
     public void onReset() {
         if (runner == null) {
             System.out.println("Load array first!");
@@ -59,6 +82,7 @@ public class MainController {
         runner.reset();
         render();
     }
+
     public void onPrev() {
         if (runner == null) {
             System.out.println("Load array first!");
@@ -72,6 +96,7 @@ public class MainController {
             }
         }
     }
+
     public void onNext() {
         if (runner == null) {
             System.out.println("Load array first!");
@@ -79,6 +104,9 @@ public class MainController {
         }
         if (runner.hasNext()) {
             runner.next();
+            if (runner.getCurrentStep() instanceof NoOpStep) {
+                lblNoOps.setText(runner.getCurrentStep().getDescription());
+            }
             render();
             if (!runner.hasNext()) {
                 if (StepRunner.isSorted(runner.getState().getData())) {
@@ -87,7 +115,20 @@ public class MainController {
             }
         }
     }
+
     public void onPlay() {
+        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(50), event -> {
+//                if (runner.hasNext()) {
+//                    runner.next();
+//                    render();
+//                }
+            this.onNext();
+        }
+        ));
+
+        timeline.setCycleCount(Animation.INDEFINITE);
+        timeline.play();
+        System.out.println("Playing");
     }
 
     public void onPause() {
@@ -104,23 +145,44 @@ public class MainController {
         ArrayState state = runner.getState();
         renderPane.getChildren().clear();
         double x = 0;
-        double width = 40;
+        double width = 15;
+
+        int a = state.getHighlightA();
+        int b = state.getHighlightB();
         for (int i = 0; i < state.getData().length; i++) {
             x += width;
             double height = state.get(i) * 10;
             double y = renderPane.getHeight() - height;
-            if (i == state.getHighlightA() | i == state.getHighlightB()) {
-                Color color = Color.RED;
-                drawRectangle(x, y, width, height, color, renderPane);
+            Color color = Color.BLACK; // Default color
+
+//            if (i == state.getHighlightA() | i == state.getHighlightB()) {
+//                Color color = Color.RED;
+//                drawRectangle(x, y, width, height, color, renderPane);
+//            }
+//            else {
+//                Color color = Color.BLACK;
+//                drawRectangle(x, y, width, height, color, renderPane);
+//            }
+            // Rule: Range Highlight (e.g., Merge Sort)
+            // If A <= B and B is valid, highlight everything in between
+            if (a != -1 && b != -1 && a <= b) {
+                if (i >= a && i <= b) {
+                    color = Color.LIGHTCORAL; // Visually distinct for ranges
+                }
             }
-            else {
-                Color color = Color.BLACK;
-                drawRectangle(x, y, width, height, color, renderPane);
+            // Rule: Specific Points (e.g., Insertion Sort Comparison/Swap)
+            // If the range rule didn't apply, check if this index is exactly A or B
+            else if (i == a || i == b) {
+                color = Color.RED;
             }
+
+            drawRectangle(x, y, width, height, color, renderPane);
         }
         lblComparisons.setText("Comparisons: " + state.getCounters().getComparisons());
         lblSwaps.setText("Swaps: " + state.getCounters().getSwaps());
+        lblWrites.setText("Writes: " + state.getCounters().getWrites());
         lblStepCount.setText("Steps: " + runner.getIndex() + " / " + runner.getTotalSteps());
+
     }
 
     private void initDemo() {
@@ -143,5 +205,26 @@ public class MainController {
         List<Step> steps = generator.generate(temp);
         runner = new StepRunner(data, steps);
         render();
+    }
+
+    private void LoadSelectedSortDemo(int arraySize) {
+        int[] data = new Random().ints(arraySize, 1, 101).toArray();
+        ArrayState temp = new ArrayState(data);
+        StepGenerator generator = getSelectedGenerator();
+        List<Step> steps = generator.generate(temp);
+        runner = new StepRunner(data, steps);
+        render();
+    }
+
+    private StepGenerator getSelectedGenerator() {
+        String selected = cmbAlgorithm.getValue();
+
+        if (selected.equals("Merge Sort")) {
+            return new MergeSortGenerator();
+        } else if (selected.equals("Bubble Sort")) {
+            return new BubbleSortGenerator();
+        }
+
+        return new InsertionSortGenerator();
     }
 }

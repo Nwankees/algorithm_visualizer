@@ -83,4 +83,8 @@ public class StepRunner{
 
         return true;
     }
+
+    public Step getCurrentStep() {
+        return steps.get(this.index - 1);
+    }
 }
