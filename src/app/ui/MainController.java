@@ -1,9 +1,6 @@
 package app.ui;
 
-import algo.BubbleSortGenerator;
-import algo.InsertionSortGenerator;
-import algo.MergeSortGenerator;
-import algo.StepGenerator;
+import algo.*;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -61,7 +58,7 @@ public class MainController {
     private Timeline timeline;
 
     public void initialize() {
-        cmbAlgorithm.getItems().addAll("Insertion Sort", "Merge Sort", "Bubble Sort");
+        cmbAlgorithm.getItems().addAll("Insertion Sort", "Merge Sort", "Bubble Sort", "Selection Sort");
 
         cmbAlgorithm.getSelectionModel().selectFirst();
     }
@@ -223,6 +220,8 @@ public class MainController {
             return new MergeSortGenerator();
         } else if (selected.equals("Bubble Sort")) {
             return new BubbleSortGenerator();
+        } else if (selected.equals("Selection Sort")) {
+            return new SelectionSortGenerator();
         }
 
         return new InsertionSortGenerator();
