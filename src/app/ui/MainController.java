@@ -58,7 +58,7 @@ public class MainController {
     private Timeline timeline;
 
     public void initialize() {
-        cmbAlgorithm.getItems().addAll("Insertion Sort", "Merge Sort", "Bubble Sort", "Selection Sort");
+        cmbAlgorithm.getItems().addAll("Insertion Sort", "Merge Sort", "Bubble Sort", "Selection Sort", "Quick Sort");
 
         cmbAlgorithm.getSelectionModel().selectFirst();
     }
@@ -67,7 +67,7 @@ public class MainController {
         System.out.println("Loaded!");
 //        this.initDemo();
 //        this.LoadInsertionSortDemo(5);
-        this.lblStatus.setText("Not sorted ❌");
+        this.lblStatus.setText("Not sorted");
         this.LoadSelectedSortDemo(10);
     }
 
@@ -88,8 +88,8 @@ public class MainController {
         if (runner.hasPrev()) {
             runner.prev();
             render();
-            if (Objects.equals(lblStatus.getText(), "Sorted ✅")) {
-                lblStatus.setText("Not sorted ❌");
+            if (Objects.equals(lblStatus.getText(), "Sorted")) {
+                lblStatus.setText("Not sorted ");
             }
         }
     }
@@ -104,10 +104,12 @@ public class MainController {
             if (runner.getCurrentStep() instanceof NoOpStep) {
                 lblNoOps.setText(runner.getCurrentStep().getDescription());
             }
+            else { lblNoOps.setText(""); }
+            System.out.println(runner.getCurrentStep());
             render();
             if (!runner.hasNext()) {
                 if (StepRunner.isSorted(runner.getState().getData())) {
-                    lblStatus.setText("Sorted ✅");
+                    lblStatus.setText("Sorted");
                 }
             }
         }
@@ -222,6 +224,8 @@ public class MainController {
             return new BubbleSortGenerator();
         } else if (selected.equals("Selection Sort")) {
             return new SelectionSortGenerator();
+        } else if (selected.equals("Quick Sort")) {
+            return new QuickSortGenerator();
         }
 
         return new InsertionSortGenerator();
