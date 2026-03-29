@@ -58,7 +58,7 @@ public class MainController {
     private Timeline timeline;
 
     public void initialize() {
-        cmbAlgorithm.getItems().addAll("Insertion Sort", "Merge Sort", "Bubble Sort", "Selection Sort", "Quick Sort");
+        cmbAlgorithm.getItems().addAll("Insertion Sort", "Merge Sort", "Bubble Sort", "Selection Sort", "Quick Sort", "Heap Sort");
 
         cmbAlgorithm.getSelectionModel().selectFirst();
     }
@@ -68,7 +68,7 @@ public class MainController {
 //        this.initDemo();
 //        this.LoadInsertionSortDemo(5);
         this.lblStatus.setText("Not sorted");
-        this.LoadSelectedSortDemo(10);
+        this.LoadSelectedSortDemo(100);
     }
 
     public void onReset() {
@@ -105,7 +105,7 @@ public class MainController {
                 lblNoOps.setText(runner.getCurrentStep().getDescription());
             }
             else { lblNoOps.setText(""); }
-            System.out.println(runner.getCurrentStep());
+            System.out.println(runner.getCurrentStep().getDescription());
             render();
             if (!runner.hasNext()) {
                 if (StepRunner.isSorted(runner.getState().getData())) {
@@ -148,6 +148,8 @@ public class MainController {
 
         int a = state.getHighlightA();
         int b = state.getHighlightB();
+        int rangeStart = state.getRangeStart();
+        int rangeEnd = state.getRangeEnd();
         for (int i = 0; i < state.getData().length; i++) {
             x += width;
             double height = state.get(i) * 10;
@@ -164,17 +166,21 @@ public class MainController {
 //            }
             // Rule: Range Highlight (e.g., Merge Sort)
             // If A <= B and B is valid, highlight everything in between
-            if (a != -1 && b != -1 && a <= b) {
-                if (i >= a && i <= b) {
-                    color = Color.LIGHTCORAL; // Visually distinct for ranges
-                }
-            }
-            // Rule: Specific Points (e.g., Insertion Sort Comparison/Swap)
-            // If the range rule didn't apply, check if this index is exactly A or B
-            else if (i == a || i == b) {
+//            if (a != -1 && b != -1 && a <= b) {
+//                if (i >= a && i <= b) {
+//                    color = Color.LIGHTCORAL; // Visually distinct for ranges
+//                }
+//            }
+//            // Rule: Specific Points (e.g., Insertion Sort Comparison/Swap)
+//            // If the range rule didn't apply, check if this index is exactly A or B
+//            else if (i == a || i == b) {
+//                color = Color.RED;
+//            }
+            if (i == a || i == b) {
                 color = Color.RED;
+            } else if (rangeStart != -1 && rangeEnd != -1 && i >= rangeStart && i <= rangeEnd) {
+                color = Color.LIGHTCORAL;
             }
-
             drawRectangle(x, y, width, height, color, renderPane);
         }
         lblComparisons.setText("Comparisons: " + state.getCounters().getComparisons());
@@ -226,6 +232,8 @@ public class MainController {
             return new SelectionSortGenerator();
         } else if (selected.equals("Quick Sort")) {
             return new QuickSortGenerator();
+        } else if (selected.equals("Heap Sort")) {
+            return new HeapSortGenerator();
         }
 
         return new InsertionSortGenerator();
