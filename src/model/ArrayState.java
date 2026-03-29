@@ -6,6 +6,8 @@ public class ArrayState {
     private int[] data;
     private int highlightA;
     private int highlightB;
+    private int rangeStart = 1;
+    private int rangeEnd = -1;
     private Counters counters;
 
     public ArrayState(int[] initialData) {
@@ -59,5 +61,18 @@ public class ArrayState {
     public void resetHighlights() {
         this.highlightA = -1;
         this.highlightB = -1;
+    }
+
+    public int getRangeStart() {
+        return rangeStart;
+    }
+
+    public int getRangeEnd() {
+        return rangeEnd;
+    }
+
+    public void setRange(int start, int end) {
+        this.rangeStart = start;
+        this.rangeEnd = end;
     }
 }
