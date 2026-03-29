@@ -58,7 +58,7 @@ public class MainController {
     private Timeline timeline;
 
     public void initialize() {
-        cmbAlgorithm.getItems().addAll("Insertion Sort", "Merge Sort", "Bubble Sort", "Selection Sort", "Quick Sort", "Heap Sort");
+        cmbAlgorithm.getItems().addAll("Insertion Sort", "Merge Sort", "Bubble Sort", "Selection Sort", "Quick Sort", "Heap Sort", "Radix Sort");
 
         cmbAlgorithm.getSelectionModel().selectFirst();
     }
@@ -234,6 +234,8 @@ public class MainController {
             return new QuickSortGenerator();
         } else if (selected.equals("Heap Sort")) {
             return new HeapSortGenerator();
+        } else if (selected.equals("Radix Sort")) {
+            return new RadixSortGenerator();
         }
 
         return new InsertionSortGenerator();

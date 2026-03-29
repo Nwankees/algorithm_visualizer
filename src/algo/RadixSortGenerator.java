@@ -1,0 +1,123 @@
+package algo;
+
+import com.sun.javafx.scene.shape.ArcHelper;
+import model.ArrayState;
+import steps.CompareStep;
+import steps.SetValueStep;
+import steps.Step;
+
+import java.lang.reflect.Array;
+import java.util.*;
+
+public class RadixSortGenerator implements StepGenerator{
+    private int[] work;
+
+    @Override
+    public List<Step> generate(ArrayState initialState) {
+        this.work = Arrays.copyOf(initialState.getData(), initialState.length());
+        List<Step> out = new ArrayList<>();
+
+        radix_sort(out);
+        return out;
+    }
+
+    public void radix_sort(List<Step> out) {
+        int maxNumber = work[0];
+
+        for (int i = 1; i < work.length; i++) {
+            maxNumber = Math.max(maxNumber, work[i]);
+            out.add(new CompareStep(i, i - 1));
+        }
+
+        int maxNumberLength = Integer.toString(maxNumber).length();
+
+        for (int i = 0; i < maxNumberLength; i++) {
+            Queue<Integer> bucket0 = new LinkedList<>();
+            Queue<Integer> bucket1 = new LinkedList<>();
+            Queue<Integer> bucket2 = new LinkedList<>();
+            Queue<Integer> bucket3 = new LinkedList<>();
+            Queue<Integer> bucket4 = new LinkedList<>();
+            Queue<Integer> bucket5 = new LinkedList<>();
+            Queue<Integer> bucket6 = new LinkedList<>();
+            Queue<Integer> bucket7 = new LinkedList<>();
+            Queue<Integer> bucket8 = new LinkedList<>();
+            Queue<Integer> bucket9 = new LinkedList<>();
+            ArrayList<Queue<Integer>> buckets = new ArrayList<>();
+            buckets.add(bucket0);
+            buckets.add(bucket1);
+            buckets.add(bucket2);
+            buckets.add(bucket3);
+            buckets.add(bucket4);
+            buckets.add(bucket5);
+            buckets.add(bucket6);
+            buckets.add(bucket7);
+            buckets.add(bucket8);
+            buckets.add(bucket9);
+
+            for (int number : work) {
+                int lastDigit;
+                if ((i + 1) > Integer.toString(number).length()) {
+                    lastDigit = 0;
+                }
+                else {
+                    lastDigit = Math.floorMod(number, (int) Math.pow(10, i + 1));
+                }
+                placeInBuckets(buckets, number, lastDigit);
+            }
+
+            work = scanBuckets(buckets, out).stream().mapToInt(Integer::intValue).toArray();
+            System.out.println(Arrays.toString(work));
+        }
+
+    }
+
+    public void placeInBuckets(ArrayList<Queue<Integer>> buckets, int digit, int lastDigit) {
+        int bucketToPLace = Integer.parseInt(String.valueOf(Integer.toString(lastDigit).charAt(0)));
+        buckets.get(bucketToPLace).add(digit);
+        System.out.println("We placed " + digit + " in Bucket " + bucketToPLace + " because its last digit was " + lastDigit);
+    }
+
+    public ArrayList<Integer> scanBuckets(ArrayList<Queue<Integer>> buckets, List<Step> out) {
+        ArrayList<Integer> newArray = new ArrayList<>();
+        int i = 0;
+        for (Queue<Integer> bucket : buckets) {
+            while (!bucket.isEmpty()) {
+                int val = bucket.remove();
+                newArray.add(val);
+                out.add(new SetValueStep(i, val));
+                i++;
+            }
+        }
+
+        boolean allAreEmpty = true;
+        for (Queue<Integer> bucket : buckets) {
+            if (bucket.isEmpty()) {
+                allAreEmpty = true;
+            }
+            else {
+                allAreEmpty = false;
+            }
+        }
+
+        System.out.println("Are all the buckets empty?: " + allAreEmpty);
+
+        return newArray;
+    }
+
+    public void main(String[] args) {
+        int test = 3456;
+        Random random = new Random();
+        int[] testArr = random.ints(9, 1, 100).toArray();
+        System.out.println(Arrays.toString(testArr));
+        String hey = "hello";
+        int lastDigit = Math.floorMod(test, (int) Math.pow(10, 2));
+        System.out.println(Integer.parseInt("5") + 10);
+
+        RadixSortGenerator radixSortGenerator = new RadixSortGenerator();
+        ArrayState arrayState = new ArrayState(testArr);
+
+        radixSortGenerator.generate(arrayState);
+        System.out.println(Arrays.toString(radixSortGenerator.work));
+    }
+
+}
