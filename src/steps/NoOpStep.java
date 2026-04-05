@@ -2,7 +2,7 @@ package steps;
 
 import model.ArrayState;
 
-public class NoOpStep implements Step{
+public class NoOpStep implements Step<ArrayState>{
     private String description;
 
     public NoOpStep(String description) {

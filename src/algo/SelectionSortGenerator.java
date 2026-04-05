@@ -8,11 +8,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class SelectionSortGenerator implements StepGenerator{
-    private List<Step> steps;
+public class SelectionSortGenerator implements StepGenerator<ArrayState>{
+    private List<Step<ArrayState>> steps;
 
     @Override
-    public List<Step> generate(ArrayState arrayState) {
+    public List<Step<ArrayState>> generate(ArrayState arrayState) {
         steps = new ArrayList<>();
         int[] state = arrayState.getData();
 

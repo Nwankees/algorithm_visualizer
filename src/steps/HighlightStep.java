@@ -2,7 +2,7 @@ package steps;
 
 import model.ArrayState;
 
-public class HighlightStep implements Step{
+public class HighlightStep implements Step<ArrayState>{
     private final int a;
     private final int b;
 

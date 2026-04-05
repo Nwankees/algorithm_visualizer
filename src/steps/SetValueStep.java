@@ -2,7 +2,7 @@ package steps;
 
 import model.ArrayState;
 
-public class SetValueStep implements Step{
+public class SetValueStep implements Step<ArrayState>{
     private final int index;
     private final int value;
 

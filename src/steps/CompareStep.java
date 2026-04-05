@@ -2,7 +2,7 @@ package steps;
 
 import model.ArrayState;
 
-public class CompareStep implements Step{
+public class CompareStep implements Step<ArrayState>{
     private final int i;
     private final int j;
 

@@ -6,11 +6,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class QuickSortGenerator implements StepGenerator {
+public class QuickSortGenerator implements StepGenerator<ArrayState> {
     private int[] work;
 
     @Override
-    public List<Step> generate(ArrayState initialState) {
+    public List<Step<ArrayState>> generate(ArrayState initialState) {
         work = Arrays.copyOf(initialState.getData(), initialState.length());
         List<Step> out = new ArrayList<>();
 
@@ -20,7 +20,7 @@ public class QuickSortGenerator implements StepGenerator {
         return out;
     }
 
-    private void quickSort(int low, int high, List<Step> out) {
+    private void quickSort(int low, int high, List<Step<ArrayState>> out) {
         if (low < high) {
             // Highlight the current range being considered
             out.add(new RangeHighlightStep(low, high));
@@ -35,7 +35,7 @@ public class QuickSortGenerator implements StepGenerator {
         }
     }
 
-    private int partition(int low, int high, List<Step> out) {
+    private int partition(int low, int high, List<Step<ArrayState>> out) {
         int pivot = work[high]; // Last element as pivot
         int i = low - 1; // Boundary for the "smaller than pivot" zone
 
@@ -57,7 +57,7 @@ public class QuickSortGenerator implements StepGenerator {
         return i + 1;
     }
 
-    private void swap(int a, int b, List<Step> out) {
+    private void swap(int a, int b, List<Step<ArrayState>> out) {
         if (a != b) {
             int temp = work[a];
             work[a] = work[b];

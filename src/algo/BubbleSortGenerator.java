@@ -9,12 +9,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class BubbleSortGenerator implements StepGenerator{
+public class BubbleSortGenerator implements StepGenerator<ArrayState>{
     private int[] work;
-    private List<Step> steps;
+    private List<Step<ArrayState>> steps;
 
     @Override
-    public List<Step> generate(ArrayState initialState) {
+    public List<Step<ArrayState>> generate(ArrayState initialState) {
         work = Arrays.copyOf(initialState.getData(), initialState.getData().length);
         steps = new ArrayList<>();
 

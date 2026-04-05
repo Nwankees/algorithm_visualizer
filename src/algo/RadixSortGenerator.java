@@ -9,11 +9,11 @@ import steps.Step;
 import java.lang.reflect.Array;
 import java.util.*;
 
-public class RadixSortGenerator implements StepGenerator{
+public class RadixSortGenerator implements StepGenerator<ArrayState>{
     private int[] work;
 
     @Override
-    public List<Step> generate(ArrayState initialState) {
+    public List<Step<ArrayState>> generate(ArrayState initialState) {
         this.work = Arrays.copyOf(initialState.getData(), initialState.length());
         List<Step> out = new ArrayList<>();
 
@@ -21,7 +21,7 @@ public class RadixSortGenerator implements StepGenerator{
         return out;
     }
 
-    public void radix_sort(List<Step> out) {
+    public void radix_sort(List<Step<ArrayState>> out) {
         int maxNumber = work[0];
 
         for (int i = 1; i < work.length; i++) {
@@ -66,7 +66,7 @@ public class RadixSortGenerator implements StepGenerator{
 
     }
 
-    public ArrayList<Integer> scanBuckets(ArrayList<Queue<Integer>> buckets, List<Step> out) {
+    public ArrayList<Integer> scanBuckets(ArrayList<Queue<Integer>> buckets, List<Step<ArrayState>> out) {
         ArrayList<Integer> newArray = new ArrayList<>();
         int i = 0;
         for (Queue<Integer> bucket : buckets) {

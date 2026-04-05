@@ -2,7 +2,7 @@ package steps;
 
 import model.ArrayState;
 
-public class RangeHighlightStep implements Step{
+public class RangeHighlightStep implements Step<ArrayState>{
     private int left;
     private int right;
 

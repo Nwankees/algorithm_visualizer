@@ -2,8 +2,8 @@ package steps;
 
 import model.ArrayState;
 
-public interface Step {
-    void apply(ArrayState state);
+public interface Step<S> {
+    void apply(S state);
     StepType getType();
     String getDescription();
 }

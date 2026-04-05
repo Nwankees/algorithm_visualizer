@@ -11,12 +11,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-public class InsertionSortGenerator implements StepGenerator {
-    private List<Step> steps;
+public class InsertionSortGenerator implements StepGenerator<ArrayState> {
+    private List<Step<ArrayState>> steps;
     private int[] work;
 
     @Override
-    public List<Step> generate(ArrayState initialState) {
+    public List<Step<ArrayState>> generate(ArrayState initialState) {
         work = Arrays.copyOf(initialState.getData(), initialState.length());
         steps = new ArrayList<>();
 
@@ -46,7 +46,7 @@ public class InsertionSortGenerator implements StepGenerator {
         ArrayState state = new ArrayState(testData);
 
         InsertionSortGenerator gen = new InsertionSortGenerator();
-        List<Step> result = gen.generate(state);
+        List<Step<ArrayState>> result = gen.generate(state);
 
         System.out.println("Generated Steps for [4, 2, 7, 1, 8, 3, 9, 5, 10, 6]:");
         for (int i = 0; i < result.size(); i++) {

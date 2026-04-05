@@ -11,19 +11,19 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-public class HeapSortGenerator implements StepGenerator {
+public class HeapSortGenerator implements StepGenerator<ArrayState> {
     private int[] work;
 
-    public List<Step> generate(ArrayState initialState) {
+    public List<Step<ArrayState>> generate(ArrayState initialState) {
         work = Arrays.copyOf(initialState.getData(), initialState.length());
-        List<Step> out = new ArrayList<>();
+        List<Step<ArrayState>> out = new ArrayList<>();
 
         heapify(out);
         sort(out);
         return out;
     }
 
-    public void heapify(List<Step> out) {
+    public void heapify(List<Step<ArrayState>> out) {
         int indexNode = (Math.floorDiv(work.length, 2)) - 1;
 
         for (int i = indexNode; i >= 0; i--) {
@@ -31,7 +31,7 @@ public class HeapSortGenerator implements StepGenerator {
         }
     }
 
-    private void siftDown(int i, int heapSize, List<Step> out) {
+    private void siftDown(int i, int heapSize, List<Step<ArrayState>> out) {
         int parent = i;
 
         while (true) {
@@ -64,7 +64,7 @@ public class HeapSortGenerator implements StepGenerator {
         }
     }
 
-    private void swap(int i, int j, List<Step> out) {
+    private void swap(int i, int j, List<Step<ArrayState>> out) {
         if (i != j) {
             int temp = work[i];
             work[i] = work[j];
@@ -74,7 +74,7 @@ public class HeapSortGenerator implements StepGenerator {
         }
     }
 
-    public void sort(List<Step> out) {
+    public void sort(List<Step<ArrayState>> out) {
         for (int i = work.length - 1; i > 0; i--) {
             swap(i, 0, out);
             siftDown(0, i, out);

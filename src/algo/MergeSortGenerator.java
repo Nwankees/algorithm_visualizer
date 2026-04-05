@@ -7,20 +7,20 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class MergeSortGenerator implements StepGenerator{
+public class MergeSortGenerator implements StepGenerator<ArrayState>{
     private int[] work;
 //    private List<Step> steps;
 
     @Override
-    public List<Step> generate(ArrayState initialState) {
+    public List<Step<ArrayState>> generate(ArrayState initialState) {
         work = Arrays.copyOf(initialState.getData(), initialState.length());
-        List<Step> out = new ArrayList<>();
+        List<Step<ArrayState>> out = new ArrayList<>();
 
         mergeSort(work, 0, work.length - 1, out);
         return out;
     }
 
-    private void mergeSort(int[] work, int left, int right, List<Step> out) {
+    private void mergeSort(int[] work, int left, int right, List<Step<ArrayState>> out) {
         out.add(new RangeHighlightStep(left, right));
         if (left >= right) {
             return;
@@ -36,7 +36,7 @@ public class MergeSortGenerator implements StepGenerator{
         merge(work, left, mid, right, out);
     }
 
-    private void merge(int[] work, int left, int mid, int right, List<Step> out) {
+    private void merge(int[] work, int left, int mid, int right, List<Step<ArrayState>> out) {
         int[] leftPart = Arrays.copyOfRange(work, left, mid + 1);
         int[] rightPart = Arrays.copyOfRange(work, mid + 1, right + 1);
 
