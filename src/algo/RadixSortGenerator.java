@@ -55,26 +55,15 @@ public class RadixSortGenerator implements StepGenerator{
             buckets.add(bucket9);
 
             for (int number : work) {
-                int lastDigit;
-                if ((i + 1) > Integer.toString(number).length()) {
-                    lastDigit = 0;
-                }
-                else {
-                    lastDigit = Math.floorMod(number, (int) Math.pow(10, i + 1));
-                }
-                placeInBuckets(buckets, number, lastDigit);
+                int divisor = (int) Math.pow(10, i);
+                int digit = (number / divisor) % 10;
+                buckets.get(digit).add(number);
             }
 
             work = scanBuckets(buckets, out).stream().mapToInt(Integer::intValue).toArray();
             System.out.println(Arrays.toString(work));
         }
 
-    }
-
-    public void placeInBuckets(ArrayList<Queue<Integer>> buckets, int digit, int lastDigit) {
-        int bucketToPLace = Integer.parseInt(String.valueOf(Integer.toString(lastDigit).charAt(0)));
-        buckets.get(bucketToPLace).add(digit);
-        System.out.println("We placed " + digit + " in Bucket " + bucketToPLace + " because its last digit was " + lastDigit);
     }
 
     public ArrayList<Integer> scanBuckets(ArrayList<Queue<Integer>> buckets, List<Step> out) {
