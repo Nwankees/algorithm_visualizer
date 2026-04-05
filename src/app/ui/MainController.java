@@ -62,8 +62,10 @@ public class MainController {
 
     public void initialize() {
         cmbAlgorithm.getItems().addAll("Insertion Sort", "Merge Sort", "Bubble Sort", "Selection Sort", "Quick Sort", "Heap Sort", "Radix Sort");
+        cmbViewMode.getItems().addAll("Array", "Trees");
 
         cmbAlgorithm.getSelectionModel().selectFirst();
+        cmbViewMode.getSelectionModel().selectFirst();
     }
 
     public void onLoad() {
@@ -71,7 +73,7 @@ public class MainController {
 //        this.initDemo();
 //        this.LoadInsertionSortDemo(5);
         this.lblStatus.setText("Not sorted");
-        this.LoadSelectedSortDemo(100);
+        this.loadArrays(100);
     }
 
     public void onReset() {
@@ -143,54 +145,62 @@ public class MainController {
         drawingPane.getChildren().add(rectangle);
     }
 
-private void render() {
-    ArrayState state = runner.getState();
-    renderPane.getChildren().clear();
+    private void render() {
+        String optionSelected = this.cmbViewMode.getSelectionModel().getSelectedItem();
 
-    // 1. Get current dimensions of the drawing area
-    double paneWidth = renderPane.getWidth();
-    double paneHeight = renderPane.getHeight();
-    int n = state.getData().length;
+        System.out.println(optionSelected);
+        ArrayState state = runner.getState();
+        renderPane.getChildren().clear();
 
-    // 2. Calculate dynamic width
-    double barWidth = paneWidth / n;
+        if (optionSelected.equals("Array")) {
+            // 1. Get current dimensions of the drawing area
+            double paneWidth = renderPane.getWidth();
+            double paneHeight = renderPane.getHeight();
+            int n = state.getData().length;
 
-    // 3. Find Max Value for height scaling
-    // (You can also hardcode 100 if you know that's your max)
-    double maxValue = 0;
-    for (int val : state.getData()) {
-        if (val > maxValue) maxValue = val;
-    }
+            // 2. Calculate dynamic width
+            double barWidth = paneWidth / n;
 
-    int a = state.getHighlightA();
-    int b = state.getHighlightB();
-    int rStart = state.getRangeStart();
-    int rEnd = state.getRangeEnd();
+            // 3. Find Max Value for height scaling
+            // (You can also hardcode 100 if you know that's your max)
+            double maxValue = 0;
+            for (int val : state.getData()) {
+                if (val > maxValue) maxValue = val;
+            }
 
-    for (int i = 0; i < n; i++) {
-        // 4. Calculate X based on barWidth
-        double x = i * barWidth;
+            int a = state.getHighlightA();
+            int b = state.getHighlightB();
+            int rStart = state.getRangeStart();
+            int rEnd = state.getRangeEnd();
 
-        // 5. Calculate Height relative to the pane's height
-        double height = (state.get(i) / maxValue) * paneHeight;
+            for (int i = 0; i < n; i++) {
+                // 4. Calculate X based on barWidth
+                double x = i * barWidth;
 
-        // 6. Calculate Y so bars grow from the bottom
-        double y = paneHeight - height;
+                // 5. Calculate Height relative to the pane's height
+                double height = (state.get(i) / maxValue) * paneHeight;
 
-        Color color = Color.BLACK;
+                // 6. Calculate Y so bars grow from the bottom
+                double y = paneHeight - height;
 
-        if (i == a || i == b) {
-            color = Color.RED;
-        } else if (rStart != -1 && rEnd != -1 && i >= rStart && i <= rEnd) {
-            color = Color.LIGHTCORAL;
+                Color color = Color.BLACK;
+
+                if (i == a || i == b) {
+                    color = Color.RED;
+                } else if (rStart != -1 && rEnd != -1 && i >= rStart && i <= rEnd) {
+                    color = Color.LIGHTCORAL;
+                }
+
+                drawRectangle(x, y, barWidth, height, color, renderPane);
+            }
+        }
+        else if (optionSelected.equals("Trees")) {
+
         }
 
-        drawRectangle(x, y, barWidth, height, color, renderPane);
+        // Update labels...
+        lblStepCount.setText("Steps: " + runner.getIndex() + " / " + runner.getTotalSteps());
     }
-
-    // Update labels...
-    lblStepCount.setText("Steps: " + runner.getIndex() + " / " + runner.getTotalSteps());
-}
 
     private void initDemo() {
         int[] demo = {4, 2, 7, 1, 8, 3, 9, 5, 10, 6};
@@ -209,21 +219,27 @@ private void render() {
         int[] data = new Random().ints(arraySize, 1, 101).toArray();
         ArrayState temp = new ArrayState(data);
         InsertionSortGenerator generator = new InsertionSortGenerator();
-        List<Step> steps = generator.generate(temp);
+        List<Step<ArrayState>> steps = generator.generate(temp);
         runner = new StepRunner(data, steps);
         render();
     }
 
-    private void LoadSelectedSortDemo(int arraySize) {
-        int[] data = new Random().ints(arraySize, 1, 10000).toArray();
-        ArrayState temp = new ArrayState(data);
-        StepGenerator generator = getSelectedGenerator();
-        List<Step> steps = generator.generate(temp);
-        runner = new StepRunner(data, steps);
+    private void loadArrays(int arraySize) {
+        String optionSelected = this.cmbViewMode.getSelectionModel().getSelectedItem();
+        if (optionSelected.equals("Arrays")) {
+            int[] data = new Random().ints(arraySize, 1, 10000).toArray();
+            ArrayState temp = new ArrayState(data);
+            StepGenerator<ArrayState> generator = getSelectedGenerator();
+            List<Step<ArrayState>> steps = generator.generate(temp);
+            runner = new StepRunner(data, steps);
+        }
+        else if (optionSelected.equals("Trees")) {
+
+        }
         render();
     }
 
-    private StepGenerator getSelectedGenerator() {
+    private StepGenerator<ArrayState> getSelectedGenerator() {
         String selected = cmbAlgorithm.getValue();
 
         if (selected.equals("Merge Sort")) {

@@ -8,12 +8,12 @@ import java.util.Arrays;
 import java.util.List;
 
 public class StepRunner{
-    private List<Step> steps;
+    private List<Step<ArrayState>> steps;
     private int[] initialData;
     private ArrayState state;
     private int index;
 
-    public StepRunner(int[] initialData, List<Step> steps) {
+    public StepRunner(int[] initialData, List<Step<ArrayState>> steps) {
         this.initialData = Arrays.copyOf(initialData, initialData.length);
         this.steps = steps;
         state = new ArrayState(Arrays.copyOf(initialData, initialData.length));
@@ -46,7 +46,7 @@ public class StepRunner{
             return;
         }
 
-        Step currentStep = this.steps.get(this.index);
+        Step<ArrayState> currentStep = this.steps.get(this.index);
 
         currentStep.apply(this.state);
         this.index += 1;
@@ -68,7 +68,7 @@ public class StepRunner{
         int target = this.index - 1;
         this.reset();
         for (int k=0; k < target ; k++){
-            Step currentStep = steps.get(k);
+            Step<ArrayState> currentStep = steps.get(k);
             currentStep.apply(this.state);
         }
         this.index = target;
@@ -84,7 +84,7 @@ public class StepRunner{
         return true;
     }
 
-    public Step getCurrentStep() {
+    public Step<ArrayState> getCurrentStep() {
         return steps.get(this.index - 1);
     }
 }
