@@ -54,6 +54,9 @@ public class MainController {
     private Pane renderPane;
     @FXML
     private ComboBox<String> cmbAlgorithm;
+    @FXML
+    private ComboBox<String> cmbViewMode;
+
     private StepRunner runner;
     private Timeline timeline;
 
@@ -140,55 +143,54 @@ public class MainController {
         drawingPane.getChildren().add(rectangle);
     }
 
-    private void render() {
-        ArrayState state = runner.getState();
-        renderPane.getChildren().clear();
-        double x = 0;
-        double width = 15;
+private void render() {
+    ArrayState state = runner.getState();
+    renderPane.getChildren().clear();
 
-        int a = state.getHighlightA();
-        int b = state.getHighlightB();
-        int rangeStart = state.getRangeStart();
-        int rangeEnd = state.getRangeEnd();
-        for (int i = 0; i < state.getData().length; i++) {
-            x += width;
-            double height = state.get(i) * 10;
-            double y = renderPane.getHeight() - height;
-            Color color = Color.BLACK; // Default color
+    // 1. Get current dimensions of the drawing area
+    double paneWidth = renderPane.getWidth();
+    double paneHeight = renderPane.getHeight();
+    int n = state.getData().length;
 
-//            if (i == state.getHighlightA() | i == state.getHighlightB()) {
-//                Color color = Color.RED;
-//                drawRectangle(x, y, width, height, color, renderPane);
-//            }
-//            else {
-//                Color color = Color.BLACK;
-//                drawRectangle(x, y, width, height, color, renderPane);
-//            }
-            // Rule: Range Highlight (e.g., Merge Sort)
-            // If A <= B and B is valid, highlight everything in between
-//            if (a != -1 && b != -1 && a <= b) {
-//                if (i >= a && i <= b) {
-//                    color = Color.LIGHTCORAL; // Visually distinct for ranges
-//                }
-//            }
-//            // Rule: Specific Points (e.g., Insertion Sort Comparison/Swap)
-//            // If the range rule didn't apply, check if this index is exactly A or B
-//            else if (i == a || i == b) {
-//                color = Color.RED;
-//            }
-            if (i == a || i == b) {
-                color = Color.RED;
-            } else if (rangeStart != -1 && rangeEnd != -1 && i >= rangeStart && i <= rangeEnd) {
-                color = Color.LIGHTCORAL;
-            }
-            drawRectangle(x, y, width, height, color, renderPane);
-        }
-        lblComparisons.setText("Comparisons: " + state.getCounters().getComparisons());
-        lblSwaps.setText("Swaps: " + state.getCounters().getSwaps());
-        lblWrites.setText("Writes: " + state.getCounters().getWrites());
-        lblStepCount.setText("Steps: " + runner.getIndex() + " / " + runner.getTotalSteps());
+    // 2. Calculate dynamic width
+    double barWidth = paneWidth / n;
 
+    // 3. Find Max Value for height scaling
+    // (You can also hardcode 100 if you know that's your max)
+    double maxValue = 0;
+    for (int val : state.getData()) {
+        if (val > maxValue) maxValue = val;
     }
+
+    int a = state.getHighlightA();
+    int b = state.getHighlightB();
+    int rStart = state.getRangeStart();
+    int rEnd = state.getRangeEnd();
+
+    for (int i = 0; i < n; i++) {
+        // 4. Calculate X based on barWidth
+        double x = i * barWidth;
+
+        // 5. Calculate Height relative to the pane's height
+        double height = (state.get(i) / maxValue) * paneHeight;
+
+        // 6. Calculate Y so bars grow from the bottom
+        double y = paneHeight - height;
+
+        Color color = Color.BLACK;
+
+        if (i == a || i == b) {
+            color = Color.RED;
+        } else if (rStart != -1 && rEnd != -1 && i >= rStart && i <= rEnd) {
+            color = Color.LIGHTCORAL;
+        }
+
+        drawRectangle(x, y, barWidth, height, color, renderPane);
+    }
+
+    // Update labels...
+    lblStepCount.setText("Steps: " + runner.getIndex() + " / " + runner.getTotalSteps());
+}
 
     private void initDemo() {
         int[] demo = {4, 2, 7, 1, 8, 3, 9, 5, 10, 6};
@@ -213,7 +215,7 @@ public class MainController {
     }
 
     private void LoadSelectedSortDemo(int arraySize) {
-        int[] data = new Random().ints(arraySize, 1, 101).toArray();
+        int[] data = new Random().ints(arraySize, 1, 10000).toArray();
         ArrayState temp = new ArrayState(data);
         StepGenerator generator = getSelectedGenerator();
         List<Step> steps = generator.generate(temp);
