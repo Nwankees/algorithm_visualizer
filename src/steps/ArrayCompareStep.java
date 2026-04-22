@@ -2,11 +2,11 @@ package steps;
 
 import model.ArrayState;
 
-public class CompareStep implements Step<ArrayState>{
+public class ArrayCompareStep implements Step<ArrayState>{
     private final int i;
     private final int j;
 
-    public CompareStep(int i, int j) {
+    public ArrayCompareStep(int i, int j) {
         this.i = i;
         this.j = j;
     }

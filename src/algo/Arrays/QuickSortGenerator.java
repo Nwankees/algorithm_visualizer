@@ -12,7 +12,7 @@ public class QuickSortGenerator implements StepGenerator<ArrayState> {
     @Override
     public List<Step<ArrayState>> generate(ArrayState initialState) {
         work = Arrays.copyOf(initialState.getData(), initialState.length());
-        List<Step> out = new ArrayList<>();
+        List<Step<ArrayState>> out = new ArrayList<>();
 
         // Start the recursive process
         quickSort(0, work.length - 1, out);
@@ -41,7 +41,7 @@ public class QuickSortGenerator implements StepGenerator<ArrayState> {
 
         for (int j = low; j < high; j++) {
             // Compare current element with pivot
-            out.add(new CompareStep(j, high));
+            out.add(new ArrayCompareStep(j, high));
 
             if (work[j] <= pivot) {
                 i++;

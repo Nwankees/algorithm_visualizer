@@ -20,7 +20,7 @@ public class SelectionSortGenerator implements StepGenerator<ArrayState>{
             int min_index = i;
             steps.add(new RangeHighlightStep(i + 1, state.length - 1));
             for (int j=i + 1; j < state.length; j++) {
-                steps.add(new CompareStep(j, i));
+                steps.add(new ArrayCompareStep(j, i));
                 if (state[j] < state[min_index]) {
                     min_index = j;
 //                    steps.add(new HighlightStep(j, j));

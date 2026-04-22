@@ -46,13 +46,13 @@ public class MergeSortGenerator implements StepGenerator<ArrayState>{
 
         while (i < leftPart.length && j < rightPart.length) {
             if (leftPart[i] <= rightPart[j]) {
-                out.add(new CompareStep(mid + 1+ j, left + i)); // offset from temp to main array's indices
+                out.add(new ArrayCompareStep(mid + 1+ j, left + i)); // offset from temp to main array's indices
                 work[k] = leftPart[i];
                 out.add(new SetValueStep(k, leftPart[i]));
                 i += 1;
             }
             else {
-                out.add(new CompareStep(left + i, mid + 1+ j));
+                out.add(new ArrayCompareStep(left + i, mid + 1+ j));
                 work[k] = rightPart[j];
                 out.add(new SetValueStep(k, rightPart[j]));
                 j += 1;

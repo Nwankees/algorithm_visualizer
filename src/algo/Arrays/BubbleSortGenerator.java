@@ -1,7 +1,7 @@
 package algo;
 
 import model.ArrayState;
-import steps.CompareStep;
+import steps.ArrayCompareStep;
 import steps.Step;
 import steps.SwapStep;
 
@@ -23,7 +23,7 @@ public class BubbleSortGenerator implements StepGenerator<ArrayState>{
             boolean swapped = false;
             for (int j=0; j < work.length - 1 - i; j++) {
                 if (work[j + 1] < work[j]) {
-                    steps.add(new CompareStep(j+ 1, j));
+                    steps.add(new ArrayCompareStep(j+ 1, j));
                     int temp = work[j + 1];
                     work[j + 1] = work[j];
                     work[j] = temp;

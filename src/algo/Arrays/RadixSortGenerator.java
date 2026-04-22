@@ -2,7 +2,7 @@ package algo;
 
 import com.sun.javafx.scene.shape.ArcHelper;
 import model.ArrayState;
-import steps.CompareStep;
+import steps.ArrayCompareStep;
 import steps.SetValueStep;
 import steps.Step;
 
@@ -15,7 +15,7 @@ public class RadixSortGenerator implements StepGenerator<ArrayState>{
     @Override
     public List<Step<ArrayState>> generate(ArrayState initialState) {
         this.work = Arrays.copyOf(initialState.getData(), initialState.length());
-        List<Step> out = new ArrayList<>();
+        List<Step<ArrayState>> out = new ArrayList<>();
 
         radix_sort(out);
         return out;
@@ -26,7 +26,7 @@ public class RadixSortGenerator implements StepGenerator<ArrayState>{
 
         for (int i = 1; i < work.length; i++) {
             maxNumber = Math.max(maxNumber, work[i]);
-            out.add(new CompareStep(i, i - 1));
+            out.add(new ArrayCompareStep(i, i - 1));
         }
 
         int maxNumberLength = Integer.toString(maxNumber).length();

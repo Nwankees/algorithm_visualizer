@@ -1,7 +1,7 @@
 package algo;
 
 import model.ArrayState;
-import steps.CompareStep;
+import steps.ArrayCompareStep;
 import steps.SetValueStep;
 import steps.Step;
 import steps.SwapStep;
@@ -41,7 +41,7 @@ public class HeapSortGenerator implements StepGenerator<ArrayState> {
 
             // Compare Left Child
             if (left < heapSize) {
-                out.add(new CompareStep(left, largest)); // Log the comparison
+                out.add(new ArrayCompareStep(left, largest)); // Log the comparison
                 if (work[left] > work[largest]) {
                     largest = left;
                 }
@@ -49,7 +49,7 @@ public class HeapSortGenerator implements StepGenerator<ArrayState> {
 
             // Compare Right Child
             if (right < heapSize) {
-                out.add(new CompareStep(right, largest)); // Log the comparison
+                out.add(new ArrayCompareStep(right, largest)); // Log the comparison
                 if (work[right] > work[largest]) {
                     largest = right;
                 }

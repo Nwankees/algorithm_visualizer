@@ -1,7 +1,7 @@
 package algo;
 
 import model.ArrayState;
-import steps.CompareStep;
+import steps.ArrayCompareStep;
 import steps.SetValueStep;
 import steps.Step;
 import steps.SwapStep;
@@ -24,10 +24,10 @@ public class InsertionSortGenerator implements StepGenerator<ArrayState> {
             int temp = work[i];
             int j = i;
             if (work[j - 1] < work[j]) {
-                steps.add(new CompareStep(j - 1, j));
+                steps.add(new ArrayCompareStep(j - 1, j));
             }
             while (j > 0 && temp < work[j - 1]) {
-                steps.add(new CompareStep(j, j - 1));
+                steps.add(new ArrayCompareStep(j, j - 1));
 
                 int swapTemp = work[j];
                 work[j] = work[j - 1];
