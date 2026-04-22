@@ -1,5 +1,6 @@
-package algo;
+package algo.Arrays;
 
+import algo.StepGenerator;
 import model.ArrayState;
 import steps.*;
 import java.util.ArrayList;

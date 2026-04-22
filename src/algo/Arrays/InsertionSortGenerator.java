@@ -1,5 +1,6 @@
-package algo;
+package algo.Arrays;
 
+import algo.StepGenerator;
 import model.ArrayState;
 import steps.ArrayCompareStep;
 import steps.SetValueStep;
@@ -9,7 +10,6 @@ import steps.SwapStep;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 
 public class InsertionSortGenerator implements StepGenerator<ArrayState> {
     private List<Step<ArrayState>> steps;

@@ -1,14 +1,14 @@
-package algo;
+package algo.Arrays;
 
+import algo.StepGenerator;
 import model.ArrayState;
-import org.w3c.dom.ranges.Range;
 import steps.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class SelectionSortGenerator implements StepGenerator<ArrayState>{
+public class SelectionSortGenerator implements StepGenerator<ArrayState> {
     private List<Step<ArrayState>> steps;
 
     @Override

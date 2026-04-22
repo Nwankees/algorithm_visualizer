@@ -1,15 +1,14 @@
-package algo;
+package algo.Arrays;
 
-import com.sun.javafx.scene.shape.ArcHelper;
+import algo.StepGenerator;
 import model.ArrayState;
 import steps.ArrayCompareStep;
 import steps.SetValueStep;
 import steps.Step;
 
-import java.lang.reflect.Array;
 import java.util.*;
 
-public class RadixSortGenerator implements StepGenerator<ArrayState>{
+public class RadixSortGenerator implements StepGenerator<ArrayState> {
     private int[] work;
 
     @Override

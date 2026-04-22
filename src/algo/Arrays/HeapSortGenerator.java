@@ -1,8 +1,8 @@
-package algo;
+package algo.Arrays;
 
+import algo.StepGenerator;
 import model.ArrayState;
 import steps.ArrayCompareStep;
-import steps.SetValueStep;
 import steps.Step;
 import steps.SwapStep;
 

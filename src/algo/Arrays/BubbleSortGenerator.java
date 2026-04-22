@@ -1,5 +1,6 @@
-package algo;
+package algo.Arrays;
 
+import algo.StepGenerator;
 import model.ArrayState;
 import steps.ArrayCompareStep;
 import steps.Step;
@@ -9,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class BubbleSortGenerator implements StepGenerator<ArrayState>{
+public class BubbleSortGenerator implements StepGenerator<ArrayState> {
     private int[] work;
     private List<Step<ArrayState>> steps;
 

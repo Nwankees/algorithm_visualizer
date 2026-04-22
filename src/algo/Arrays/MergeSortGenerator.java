@@ -1,5 +1,6 @@
-package algo;
+package algo.Arrays;
 
+import algo.StepGenerator;
 import model.ArrayState;
 import steps.*;
 
@@ -7,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class MergeSortGenerator implements StepGenerator<ArrayState>{
+public class MergeSortGenerator implements StepGenerator<ArrayState> {
     private int[] work;
 //    private List<Step> steps;
 

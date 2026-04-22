@@ -3,27 +3,27 @@ package steps;
 import model.ArrayState;
 
 public class ArrayCompareStep implements Step<ArrayState>{
-    private final int i;
-    private final int j;
+private final int i;
+private final int j;
 
-    public ArrayCompareStep(int i, int j) {
-        this.i = i;
-        this.j = j;
-    }
+public ArrayCompareStep(int i, int j) {
+    this.i = i;
+    this.j = j;
+}
 
-    @Override
-    public StepType getType() {
-        return StepType.COMPARE;
-    }
+@Override
+public StepType getType() {
+    return StepType.COMPARE;
+}
 
-    @Override
-    public String getDescription() {
-        return "Compare indices " + i + " and " + j;
-    }
+@Override
+public String getDescription() {
+    return "Compare indices " + i + " and " + j;
+}
 
-    @Override
-    public void apply(ArrayState state) {
-        state.setHighlights(i, j);
-        state.getCounters().incComparisons();
+@Override
+public void apply(ArrayState state) {
+    state.setHighlights(i, j);
+    state.getCounters().incComparisons();
     }
 }
