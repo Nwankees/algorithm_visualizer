@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface StepGenerator<S> {
     List<Step<S>> generate(S initialState);
+
+    default void setKeysToInsert(List<Integer> keysToInsert) {}
 }

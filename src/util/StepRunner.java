@@ -1,26 +1,31 @@
 package util;
 
 import model.ArrayState;
+import model.BstNode;
 import steps.Step;
 import steps.StepType;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 
-public class StepRunner{
-    private List<Step<ArrayState>> steps;
+public class StepRunner<S>{
+    private List<Step<S>> steps;
     private int[] initialData;
-    private ArrayState state;
+    private S state;
     private int index;
 
-    public StepRunner(int[] initialData, List<Step<ArrayState>> steps) {
+    private final Function<int[], S> stateFactory;
+
+    public StepRunner(int[] initialData, List<Step<S>> steps, Function<int[], S> stateFactory) {
         this.initialData = Arrays.copyOf(initialData, initialData.length);
         this.steps = steps;
-        state = new ArrayState(Arrays.copyOf(initialData, initialData.length));
+        this.stateFactory = stateFactory;
+        state = stateFactory.apply(Arrays.copyOf(initialData, initialData.length));
         index = 0;
     }
 
-    public ArrayState getState() {
+    public S getState() {
         return this.state;
     }
 
@@ -46,14 +51,14 @@ public class StepRunner{
             return;
         }
 
-        Step<ArrayState> currentStep = this.steps.get(this.index);
+        Step<S> currentStep = this.steps.get(this.index);
 
         currentStep.apply(this.state);
         this.index += 1;
     }
 
     public void reset() {
-        this.state = new ArrayState(Arrays.copyOf(this.initialData, this.initialData.length));
+        this.state = stateFactory.apply(Arrays.copyOf(this.initialData, this.initialData.length));
 //        this.state.getCounters().reset();
 //        this.state.resetHighlights(); Because reinstantiating state already resets the counters and highlights
         this.index = 0;
@@ -68,7 +73,7 @@ public class StepRunner{
         int target = this.index - 1;
         this.reset();
         for (int k=0; k < target ; k++){
-            Step<ArrayState> currentStep = steps.get(k);
+            Step<S> currentStep = steps.get(k);
             currentStep.apply(this.state);
         }
         this.index = target;
@@ -84,7 +89,22 @@ public class StepRunner{
         return true;
     }
 
-    public Step<ArrayState> getCurrentStep() {
+    public Step<S> getCurrentStep() {
         return steps.get(this.index - 1);
+    }
+
+    public static boolean isValidBST(BstNode root) {
+        return recurseTree(root, Integer.MIN_VALUE, Integer.MAX_VALUE);
+    }
+
+    private static boolean recurseTree(BstNode node, int min_val, int max_val) {
+        if (node == null){
+            return true;
+        }
+        if (node.getKey() <= min_val || node.getKey() >= max_val) {
+            return false;
+        }
+        return recurseTree(node.getBstNodeLeft(), min_val, node.getKey()) &&
+                recurseTree(node.getBstNodeRight(), node.getKey(), max_val);
     }
 }

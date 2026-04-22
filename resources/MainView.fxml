@@ -19,7 +19,7 @@
             <Button fx:id="btnPlay" layoutX="156.0" layoutY="10.0" mnemonicParsing="false" onAction="#onPlay" text="Play" />
             <Button fx:id="btnPause" layoutX="208.0" layoutY="10.0" mnemonicParsing="false" onAction="#onPause" text="Pause" />
             <ComboBox fx:id="cmbAlgorithm" prefWidth="150.0" promptText="Sort Type" />
-            <Label fx:id="lblNoOps" text="Label for No Step Ops" />
+            <ComboBox fx:id="cmbViewMode" prefWidth="150.0" />
          </children>
       </HBox>
    </top>
@@ -31,6 +31,7 @@
             <Label fx:id="lblWrites" text="Writes: 0" />
             <Label fx:id="lblStepCount" layoutX="10.0" layoutY="27.0" text="Steps: 0 / 0" />
             <Label fx:id="lblStatus" text="Not sorted ❌" />
+            <Label fx:id="lblNoOps" text="Label for No Step Ops" />
          </children>
       </VBox>
    </right>
