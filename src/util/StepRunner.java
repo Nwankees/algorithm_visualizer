@@ -59,8 +59,6 @@ public class StepRunner<S>{
 
     public void reset() {
         this.state = stateFactory.apply(Arrays.copyOf(this.initialData, this.initialData.length));
-//        this.state.getCounters().reset();
-//        this.state.resetHighlights(); Because reinstantiating state already resets the counters and highlights
         this.index = 0;
     }
 
@@ -106,5 +104,9 @@ public class StepRunner<S>{
         }
         return recurseTree(node.getBstNodeLeft(), min_val, node.getKey()) &&
                 recurseTree(node.getBstNodeRight(), node.getKey(), max_val);
+    }
+
+    public boolean isAtEnd() {
+        return this.getIndex() == this.steps.size();
     }
 }
