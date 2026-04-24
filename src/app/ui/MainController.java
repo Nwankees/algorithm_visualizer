@@ -2,6 +2,7 @@ package app.ui;
 
 import algo.*;
 import algo.Arrays.*;
+import algo.Heaps.*;
 import algo.Trees.*;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
@@ -20,10 +21,12 @@ import javafx.util.Duration;
 import model.ArrayState;
 import model.BstNode;
 import model.BstState;
+import model.HeapState;
 import render.PositionedNode;
 import render.TreeLayoutHelper;
 import steps.*;
 import util.StepRunner;
+import util.HeapUtils;
 
 import java.util.*;
 
@@ -65,6 +68,7 @@ public class MainController {
 
     private StepRunner<ArrayState> arrayRunner;
     private StepRunner<BstState> bstRunner;
+    private StepRunner<HeapState> heapRunner;
     private Timeline timeline;
     private Map<String, ArrayList<String>> structureToAlgos;
     private String optionSelected;
@@ -75,15 +79,17 @@ public class MainController {
 
 
     public void initialize() {
-        structureToAlgos = new HashMap<>();
+        structureToAlgos = new LinkedHashMap<>();
         structureToAlgos.put("Array", new ArrayList<>(List.of("Insertion Sort", "Merge Sort", "Bubble Sort", "Selection Sort", "Quick Sort", "Heap Sort", "Radix Sort")));
         structureToAlgos.put("Trees", new ArrayList<>(List.of("Create", "Insert", "AVL Insert", "Search", "Delete")));
+        structureToAlgos.put("Heap", new ArrayList<>(List.of("Heap Insert", "Heap Extract")));
         cmbAlgorithm.getItems().addAll(structureToAlgos.get("Array"));
         cmbViewMode.getItems().addAll(structureToAlgos.keySet());
 
         cmbAlgorithm.getSelectionModel().selectFirst();
         cmbViewMode.getSelectionModel().selectFirst();
         optionSelected = this.cmbViewMode.getSelectionModel().getSelectedItem();
+        algoSelected = this.cmbAlgorithm.getSelectionModel().getSelectedItem();
         inputTXTField.setVisible(false);
         submitTxtField.setVisible(false);
     }
@@ -95,9 +101,15 @@ public void changeOptionSelected() {
     optionSelected = this.cmbViewMode.getSelectionModel().getSelectedItem();
 
     // Toggle visibility based on mode
-    boolean isTreeMode = optionSelected.equals("Trees");
-    inputTXTField.setVisible(isTreeMode);
-    submitTxtField.setVisible(isTreeMode);
+    algoSelected = cmbAlgorithm.getSelectionModel().getSelectedItem();
+    boolean needsInput = (optionSelected.equals("Trees") && !algoSelected.equals("Create")) ||
+            (optionSelected.equals("Heap") && algoSelected.equals("Heap Insert"));
+    inputTXTField.setVisible(needsInput);
+    submitTxtField.setVisible(needsInput);
+    if (optionSelected.equals("Heap") && algoSelected.equals("Heap Insert")) {
+        inputTXTField.setPromptText("Enter number to insert");
+        submitTxtField.setText("Insert");
+    }
 }
 
     public void changeAlgoSelected() {
@@ -111,6 +123,17 @@ public void changeOptionSelected() {
                 inputTXTField.setPromptText("Enter number to " + algoSelected);
                 submitTxtField.setText(algoSelected);
             }
+        } else if (optionSelected.equals("Heap")) {
+            boolean needsInput = algoSelected.equals("Heap Insert");
+            inputTXTField.setVisible(needsInput);
+            submitTxtField.setVisible(needsInput);
+            if (needsInput) {
+                inputTXTField.setPromptText("Enter number to insert");
+                submitTxtField.setText("Insert");
+            }
+        } else {
+            inputTXTField.setVisible(false);
+            submitTxtField.setVisible(false);
         }
     }
 
@@ -137,6 +160,13 @@ public void changeOptionSelected() {
                     return;
                 }
                 bstRunner.reset();
+                break;
+            case "Heap":
+                if (heapRunner == null) {
+                    System.out.println("Load heap first!");
+                    return;
+                }
+                heapRunner.reset();
         }
 
         render();
@@ -164,6 +194,16 @@ public void changeOptionSelected() {
                 }
                 if (bstRunner.hasPrev()) {
                     bstRunner.prev();
+                    render();
+                }
+                break;
+            case "Heap":
+                if (heapRunner == null) {
+                    System.out.println("Load heap first!");
+                    return;
+                }
+                if (heapRunner.hasPrev()) {
+                    heapRunner.prev();
                     render();
                 }
         }
@@ -207,6 +247,23 @@ public void onNext() {
                 render();
             }
             break;
+
+        case "Heap":
+            if (heapRunner == null) {
+                System.out.println("Load heap first!");
+                return;
+            }
+            if (heapRunner.hasNext()) {
+                heapRunner.next();
+                if (HeapUtils.isValidMaxHeap(heapRunner.getState().getData(), heapRunner.getState().getSize())) {
+                    lblNoOps.setText("Valid max heap!");
+                } else {
+                    lblNoOps.setText("Heapifying...");
+                }
+                System.out.println(heapRunner.getCurrentStep().getDescription());
+                render();
+            }
+            break;
     }
 }
 
@@ -219,7 +276,8 @@ public void onNext() {
         timeline = new Timeline(new KeyFrame(Duration.millis(50), event -> {
             // Check if there is actually a next step before calling onNext
             boolean hasMore = (optionSelected.equals("Array") && arrayRunner != null && arrayRunner.hasNext()) ||
-                    (optionSelected.equals("Trees") && bstRunner != null && bstRunner.hasNext());
+                    (optionSelected.equals("Trees") && bstRunner != null && bstRunner.hasNext()) ||
+                    (optionSelected.equals("Heap") && heapRunner != null && heapRunner.hasNext());
 
             if (hasMore) {
                 this.onNext();
@@ -289,6 +347,74 @@ public void onNext() {
         else if (optionSelected.equals("Trees")) {
             renderBst(bstRunner.getState());
         }
+        else if (optionSelected.equals("Heap")) {
+            renderHeap(heapRunner.getState());
+        }
+    }
+
+    private void renderHeap(HeapState state) {
+        renderPane.getChildren().clear();
+
+        int size = state.getSize();
+        if (size == 0) {
+            lblStepCount.setText("Steps: " + heapRunner.getIndex() + " / " + heapRunner.getTotalSteps());
+            lblComparisons.setText("Comparisons: " + state.getCounters().getComparisons());
+            lblSwaps.setText("Swaps: " + state.getCounters().getSwaps());
+            lblWrites.setText("Writes: " + state.getCounters().getWrites());
+            lblStatus.setText("Valid Max Heap");
+            return;
+        }
+
+        double paneWidth = renderPane.getWidth() > 0 ? renderPane.getWidth() : 700;
+        int radius = 20;
+        double verticalGap = 85;
+        int a = state.getHighlightA();
+        int b = state.getHighlightB();
+
+        Map<Integer, double[]> positions = new HashMap<>();
+        for (int i = 0; i < size; i++) {
+            int level = (int) (Math.log(i + 1) / Math.log(2));
+            int firstIndexAtLevel = (int) Math.pow(2, level) - 1;
+            int positionInLevel = i - firstIndexAtLevel;
+            int nodesInLevel = (int) Math.pow(2, level);
+
+            double x = paneWidth * (positionInLevel + 1) / (nodesInLevel + 1);
+            double y = 55 + level * verticalGap;
+            positions.put(i, new double[]{x, y});
+        }
+
+        for (int i = 0; i < size; i++) {
+            int left = state.left(i);
+            int right = state.right(i);
+            double[] parentPos = positions.get(i);
+
+            if (left < size) {
+                double[] childPos = positions.get(left);
+                renderPane.getChildren().add(new Line(parentPos[0], parentPos[1], childPos[0], childPos[1]));
+            }
+            if (right < size) {
+                double[] childPos = positions.get(right);
+                renderPane.getChildren().add(new Line(parentPos[0], parentPos[1], childPos[0], childPos[1]));
+            }
+        }
+
+        for (int i = 0; i < size; i++) {
+            double[] pos = positions.get(i);
+            Color color = (i == a || i == b) ? Color.RED : Color.BLACK;
+            Circle circle = new Circle(pos[0], pos[1], radius, color);
+            renderPane.getChildren().add(circle);
+
+            Label label = new Label(Integer.toString(state.get(i)));
+            label.setTextFill(Color.WHITE);
+            label.relocate(pos[0] - 10, pos[1] - 9);
+            renderPane.getChildren().add(label);
+        }
+
+        lblStepCount.setText("Steps: " + heapRunner.getIndex() + " / " + heapRunner.getTotalSteps());
+        lblComparisons.setText("Comparisons: " + state.getCounters().getComparisons());
+        lblSwaps.setText("Swaps: " + state.getCounters().getSwaps());
+        lblWrites.setText("Writes: " + state.getCounters().getWrites());
+        lblStatus.setText(HeapUtils.isValidMaxHeap(state.getData(), state.getSize()) ? "Valid Max Heap" : "Invalid Max Heap");
     }
 
     private void renderBst(BstState state) {
@@ -389,7 +515,26 @@ public void onNext() {
                 if (bstRunner.hasNext()) bstRunner.next();
             }
         }
+        else if (optionSelected.equals("Heap")) {
+            int[] data = new Random().ints(1, 100).distinct().limit(arraySize).toArray();
+            HeapState temp = new HeapState(data);
+            StepGenerator<HeapState> generator = getSelectedHeapGenerator();
+            if (algoSelected.equals("Heap Insert")) {
+                generator.setKeyToInsert(new Random().nextInt(99) + 1);
+            }
+            List<Step<HeapState>> steps = generator.generate(temp);
+            heapRunner = new StepRunner<HeapState>(data, steps, HeapState::new);
+        }
         render();
+    }
+
+    private StepGenerator<HeapState> getSelectedHeapGenerator() {
+        String selected = cmbAlgorithm.getValue();
+
+        if (selected.equals("Heap Extract")) {
+            return new HeapExtractGenerator();
+        }
+        return new HeapInsertGenerator();
     }
 
     private StepGenerator<ArrayState> getSelectedArrayGenerator() {
@@ -464,6 +609,17 @@ private StepGenerator<BstState> getSelectedTreeGenerator() {
     public void onOperationSubmit() {
         try {
             int key = Integer.parseInt(inputTXTField.getText());
+            if (optionSelected.equals("Heap")) {
+                HeapInsertGenerator generator = new HeapInsertGenerator();
+                generator.setKeyToInsert(key);
+                HeapState current = heapRunner == null ? new HeapState(10) : heapRunner.getState();
+                int[] baseData = Arrays.copyOf(current.getData(), current.getSize());
+                List<Step<HeapState>> steps = generator.generate(current);
+                heapRunner = new StepRunner<HeapState>(baseData, steps, HeapState::new);
+                render();
+                return;
+            }
+
             final List<Integer> historyBefore = new ArrayList<>(currentTreeKeys);
 
             StepGenerator<BstState> generator = getSelectedTreeGenerator();
