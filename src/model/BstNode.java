@@ -4,6 +4,7 @@ public class BstNode {
     private int key;
     private BstNode left;
     private BstNode right;
+    private int height = 1;
 
     public BstNode(int key) {
         this.key = key;
@@ -31,5 +32,13 @@ public class BstNode {
 
     public void setBstNodeRight(BstNode right) {
         this.right = right;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
     }
 }
