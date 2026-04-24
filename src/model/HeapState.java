@@ -8,6 +8,7 @@ public class HeapState {
     private int highlightA;
     private int highlightB;
     private Counters counters;
+    private boolean minHeap;
 
     public HeapState(int capacity) {
         this.data = new int[Math.max(capacity, 1)];
@@ -15,14 +16,20 @@ public class HeapState {
         this.highlightA = -1;
         this.highlightB = -1;
         this.counters = new Counters();
+        this.minHeap = false;
     }
 
     public HeapState(int[] initialData) {
+        this(initialData, false);
+    }
+
+    public HeapState(int[] initialData, boolean minHeap) {
         this.data = new int[Math.max(initialData.length + 10, 10)];
         this.size = 0;
         this.highlightA = -1;
         this.highlightB = -1;
         this.counters = new Counters();
+        this.minHeap = minHeap;
 
         for (int value : initialData) {
             add(value);
@@ -103,11 +110,15 @@ public class HeapState {
         return counters;
     }
 
+    public boolean isMinHeap() {
+        return minHeap;
+    }
+
     private void heapifyUp(int index) {
         int i = index;
         while (i > 0) {
             int parent = parent(i);
-            if (data[i] <= data[parent]) {
+            if (!shouldSwap(data[i], data[parent])) {
                 break;
             }
             int temp = data[i];
@@ -121,5 +132,12 @@ public class HeapState {
         int[] next = new int[Math.max(data.length * 2, 1)];
         System.arraycopy(data, 0, next, 0, data.length);
         data = next;
+    }
+
+    private boolean shouldSwap(int child, int parent) {
+        if (minHeap) {
+            return child < parent;
+        }
+        return child > parent;
     }
 }

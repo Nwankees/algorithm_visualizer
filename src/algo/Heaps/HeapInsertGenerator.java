@@ -13,6 +13,15 @@ import java.util.List;
 
 public class HeapInsertGenerator implements StepGenerator<HeapState> {
     private int value;
+    private boolean minHeap;
+
+    public HeapInsertGenerator() {
+        this(false);
+    }
+
+    public HeapInsertGenerator(boolean minHeap) {
+        this.minHeap = minHeap;
+    }
 
     @Override
     public void setKeyToInsert(int keyToInsert) {
@@ -34,7 +43,7 @@ public class HeapInsertGenerator implements StepGenerator<HeapState> {
             int parent = (i - 1) / 2;
             steps.add(new HeapCompareStep(i, parent));
 
-            if (work[i] > work[parent]) {
+            if (violatesHeapOrder(work[i], work[parent])) {
                 steps.add(new HeapSwapStep(i, parent));
                 int temp = work[i];
                 work[i] = work[parent];
@@ -46,5 +55,12 @@ public class HeapInsertGenerator implements StepGenerator<HeapState> {
         }
 
         return steps;
+    }
+
+    private boolean violatesHeapOrder(int child, int parent) {
+        if (minHeap) {
+            return child < parent;
+        }
+        return child > parent;
     }
 }

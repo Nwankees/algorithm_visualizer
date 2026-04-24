@@ -12,6 +12,16 @@ import java.util.Arrays;
 import java.util.List;
 
 public class HeapExtractGenerator implements StepGenerator<HeapState> {
+    private boolean minHeap;
+
+    public HeapExtractGenerator() {
+        this(false);
+    }
+
+    public HeapExtractGenerator(boolean minHeap) {
+        this.minHeap = minHeap;
+    }
+
     @Override
     public List<Step<HeapState>> generate(HeapState initialState) {
         List<Step<HeapState>> steps = new ArrayList<>();
@@ -41,19 +51,19 @@ public class HeapExtractGenerator implements StepGenerator<HeapState> {
                 break;
             }
 
-            int largerChild = left;
+            int selectedChild = left;
             if (right < size) {
                 steps.add(new HeapCompareStep(left, right));
-                if (work[right] > work[left]) {
-                    largerChild = right;
+                if (betterChild(work[right], work[left])) {
+                    selectedChild = right;
                 }
             }
 
-            steps.add(new HeapCompareStep(parent, largerChild));
-            if (work[parent] < work[largerChild]) {
-                steps.add(new HeapSwapStep(parent, largerChild));
-                swap(work, parent, largerChild);
-                parent = largerChild;
+            steps.add(new HeapCompareStep(parent, selectedChild));
+            if (violatesHeapOrder(work[parent], work[selectedChild])) {
+                steps.add(new HeapSwapStep(parent, selectedChild));
+                swap(work, parent, selectedChild);
+                parent = selectedChild;
             } else {
                 break;
             }
@@ -66,5 +76,19 @@ public class HeapExtractGenerator implements StepGenerator<HeapState> {
         int temp = data[i];
         data[i] = data[j];
         data[j] = temp;
+    }
+
+    private boolean betterChild(int candidate, int current) {
+        if (minHeap) {
+            return candidate < current;
+        }
+        return candidate > current;
+    }
+
+    private boolean violatesHeapOrder(int parent, int child) {
+        if (minHeap) {
+            return parent > child;
+        }
+        return parent < child;
     }
 }
