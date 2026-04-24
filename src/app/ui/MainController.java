@@ -2,10 +2,7 @@ package app.ui;
 
 import algo.*;
 import algo.Arrays.*;
-import algo.Trees.BstDeleteGenerator;
-import algo.Trees.BstInitializeGenerator;
-import algo.Trees.BstInsertGenerator;
-import algo.Trees.BstSearchGenerator;
+import algo.Trees.*;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -80,7 +77,7 @@ public class MainController {
     public void initialize() {
         structureToAlgos = new HashMap<>();
         structureToAlgos.put("Array", new ArrayList<>(List.of("Insertion Sort", "Merge Sort", "Bubble Sort", "Selection Sort", "Quick Sort", "Heap Sort", "Radix Sort")));
-        structureToAlgos.put("Trees", new ArrayList<>(List.of("Create", "Insert", "Search", "Delete")));
+        structureToAlgos.put("Trees", new ArrayList<>(List.of("Create", "Insert", "AVL Insert", "Search", "Delete")));
         cmbAlgorithm.getItems().addAll(structureToAlgos.get("Array"));
         cmbViewMode.getItems().addAll(structureToAlgos.keySet());
 
@@ -329,7 +326,9 @@ public void onNext() {
                 circle.setFill(highlightColor);
             }
             renderPane.getChildren().add(circle);
-            Label label = new Label(Integer.toString(node.getNode().getKey()));
+//            Label label = new Label(Integer.toString(node.getNode().getKey()));
+            int bf = util.Trees.AvlUtils.getBalance(node.getNode());
+            Label label = new Label(node.getNode().getKey() + "(" + bf + ")");
             label.relocate(node.getX(), node.getY());
             label.setTextFill(Color.WHITE);
             renderPane.getChildren().add(label);
@@ -424,6 +423,7 @@ private StepGenerator<BstState> getSelectedTreeGenerator() {
     return switch (selected) {
         case "Create" -> new BstInitializeGenerator();
         case "Insert" -> new BstInsertGenerator();
+        case "AVL Insert" -> new AvlInsertGenerator();
         case "Search" -> new BstSearchGenerator();
         case "Delete" -> new BstDeleteGenerator();
         default -> new BstInsertGenerator();
