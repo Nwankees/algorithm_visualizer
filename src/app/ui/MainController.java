@@ -2,6 +2,7 @@ package app.ui;
 
 import algo.*;
 import algo.Arrays.*;
+import algo.Hash.*;
 import algo.Heaps.*;
 import algo.Trees.*;
 import javafx.animation.Animation;
@@ -21,11 +22,13 @@ import javafx.util.Duration;
 import model.ArrayState;
 import model.BstNode;
 import model.BstState;
+import model.HashState;
 import model.HeapState;
 import render.PositionedNode;
 import render.TreeLayoutHelper;
 import steps.*;
 import util.StepRunner;
+import util.HashUtils;
 import util.HeapUtils;
 
 import java.util.*;
@@ -69,6 +72,7 @@ public class MainController {
     private StepRunner<ArrayState> arrayRunner;
     private StepRunner<BstState> bstRunner;
     private StepRunner<HeapState> heapRunner;
+    private StepRunner<HashState> hashRunner;
     private Timeline timeline;
     private Map<String, ArrayList<String>> structureToAlgos;
     private String optionSelected;
@@ -82,7 +86,8 @@ public class MainController {
         structureToAlgos = new LinkedHashMap<>();
         structureToAlgos.put("Array", new ArrayList<>(List.of("Insertion Sort", "Merge Sort", "Bubble Sort", "Selection Sort", "Quick Sort", "Heap Sort", "Radix Sort")));
         structureToAlgos.put("Trees", new ArrayList<>(List.of("Create", "Insert", "AVL Insert", "Search", "Delete")));
-        structureToAlgos.put("Heap", new ArrayList<>(List.of("Heap Insert", "Heap Extract")));
+        structureToAlgos.put("Heap", new ArrayList<>(List.of("Max Heap Insert", "Max Heap Extract", "Min Heap Insert", "Min Heap Extract")));
+        structureToAlgos.put("Hash Table", new ArrayList<>(List.of("Create", "Insert", "Search")));
         cmbAlgorithm.getItems().addAll(structureToAlgos.get("Array"));
         cmbViewMode.getItems().addAll(structureToAlgos.keySet());
 
@@ -103,12 +108,16 @@ public void changeOptionSelected() {
     // Toggle visibility based on mode
     algoSelected = cmbAlgorithm.getSelectionModel().getSelectedItem();
     boolean needsInput = (optionSelected.equals("Trees") && !algoSelected.equals("Create")) ||
-            (optionSelected.equals("Heap") && algoSelected.equals("Heap Insert"));
+            (optionSelected.equals("Heap") && algoSelected.endsWith("Insert")) ||
+            (optionSelected.equals("Hash Table") && !algoSelected.equals("Create"));
     inputTXTField.setVisible(needsInput);
     submitTxtField.setVisible(needsInput);
-    if (optionSelected.equals("Heap") && algoSelected.equals("Heap Insert")) {
+    if (optionSelected.equals("Heap") && algoSelected.endsWith("Insert")) {
         inputTXTField.setPromptText("Enter number to insert");
         submitTxtField.setText("Insert");
+    } else if (optionSelected.equals("Hash Table") && !algoSelected.equals("Create")) {
+        inputTXTField.setPromptText("Enter number to " + algoSelected);
+        submitTxtField.setText(algoSelected);
     }
 }
 
@@ -124,12 +133,20 @@ public void changeOptionSelected() {
                 submitTxtField.setText(algoSelected);
             }
         } else if (optionSelected.equals("Heap")) {
-            boolean needsInput = algoSelected.equals("Heap Insert");
+            boolean needsInput = algoSelected.endsWith("Insert");
             inputTXTField.setVisible(needsInput);
             submitTxtField.setVisible(needsInput);
             if (needsInput) {
                 inputTXTField.setPromptText("Enter number to insert");
                 submitTxtField.setText("Insert");
+            }
+        } else if (optionSelected.equals("Hash Table")) {
+            boolean needsInput = !algoSelected.equals("Create");
+            inputTXTField.setVisible(needsInput);
+            submitTxtField.setVisible(needsInput);
+            if (needsInput) {
+                inputTXTField.setPromptText("Enter number to " + algoSelected);
+                submitTxtField.setText(algoSelected);
             }
         } else {
             inputTXTField.setVisible(false);
@@ -141,6 +158,7 @@ public void changeOptionSelected() {
         System.out.println("Loaded!");
         if (timeline != null) timeline.stop(); // Stop any current playback
         this.lblStatus.setText("Not sorted");
+        this.lblNoOps.setText("");
         this.loadStructure(7);
     }
 
@@ -167,6 +185,13 @@ public void changeOptionSelected() {
                     return;
                 }
                 heapRunner.reset();
+                break;
+            case "Hash Table":
+                if (hashRunner == null) {
+                    System.out.println("Load hash table first!");
+                    return;
+                }
+                hashRunner.reset();
         }
 
         render();
@@ -204,6 +229,16 @@ public void changeOptionSelected() {
                 }
                 if (heapRunner.hasPrev()) {
                     heapRunner.prev();
+                    render();
+                }
+                break;
+            case "Hash Table":
+                if (hashRunner == null) {
+                    System.out.println("Load hash table first!");
+                    return;
+                }
+                if (hashRunner.hasPrev()) {
+                    hashRunner.prev();
                     render();
                 }
         }
@@ -255,12 +290,25 @@ public void onNext() {
             }
             if (heapRunner.hasNext()) {
                 heapRunner.next();
-                if (HeapUtils.isValidMaxHeap(heapRunner.getState().getData(), heapRunner.getState().getSize())) {
-                    lblNoOps.setText("Valid max heap!");
+                if (isValidSelectedHeap(heapRunner.getState())) {
+                    lblNoOps.setText(heapRunner.getState().isMinHeap() ? "Valid min heap!" : "Valid max heap!");
                 } else {
                     lblNoOps.setText("Heapifying...");
                 }
                 System.out.println(heapRunner.getCurrentStep().getDescription());
+                render();
+            }
+            break;
+
+        case "Hash Table":
+            if (hashRunner == null) {
+                System.out.println("Load hash table first!");
+                return;
+            }
+            if (hashRunner.hasNext()) {
+                hashRunner.next();
+                lblNoOps.setText(hashRunner.getCurrentStep().getDescription());
+                System.out.println(hashRunner.getCurrentStep().getDescription());
                 render();
             }
             break;
@@ -277,7 +325,8 @@ public void onNext() {
             // Check if there is actually a next step before calling onNext
             boolean hasMore = (optionSelected.equals("Array") && arrayRunner != null && arrayRunner.hasNext()) ||
                     (optionSelected.equals("Trees") && bstRunner != null && bstRunner.hasNext()) ||
-                    (optionSelected.equals("Heap") && heapRunner != null && heapRunner.hasNext());
+                    (optionSelected.equals("Heap") && heapRunner != null && heapRunner.hasNext()) ||
+                    (optionSelected.equals("Hash Table") && hashRunner != null && hashRunner.hasNext());
 
             if (hasMore) {
                 this.onNext();
@@ -350,6 +399,9 @@ public void onNext() {
         else if (optionSelected.equals("Heap")) {
             renderHeap(heapRunner.getState());
         }
+        else if (optionSelected.equals("Hash Table")) {
+            renderHash(hashRunner.getState());
+        }
     }
 
     private void renderHeap(HeapState state) {
@@ -361,7 +413,7 @@ public void onNext() {
             lblComparisons.setText("Comparisons: " + state.getCounters().getComparisons());
             lblSwaps.setText("Swaps: " + state.getCounters().getSwaps());
             lblWrites.setText("Writes: " + state.getCounters().getWrites());
-            lblStatus.setText("Valid Max Heap");
+            lblStatus.setText(state.isMinHeap() ? "Valid Min Heap" : "Valid Max Heap");
             return;
         }
 
@@ -414,7 +466,62 @@ public void onNext() {
         lblComparisons.setText("Comparisons: " + state.getCounters().getComparisons());
         lblSwaps.setText("Swaps: " + state.getCounters().getSwaps());
         lblWrites.setText("Writes: " + state.getCounters().getWrites());
-        lblStatus.setText(HeapUtils.isValidMaxHeap(state.getData(), state.getSize()) ? "Valid Max Heap" : "Invalid Max Heap");
+        lblStatus.setText(isValidSelectedHeap(state)
+                ? (state.isMinHeap() ? "Valid Min Heap" : "Valid Max Heap")
+                : (state.isMinHeap() ? "Invalid Min Heap" : "Invalid Max Heap"));
+    }
+
+    private void renderHash(HashState state) {
+        renderPane.getChildren().clear();
+
+        double paneWidth = renderPane.getWidth() > 0 ? renderPane.getWidth() : 700;
+        double slotWidth = Math.min(80, Math.max(48, (paneWidth - 40) / state.getCapacity()));
+        double slotHeight = 64;
+        double gap = 8;
+        double startX = 20;
+        double startY = 120;
+        int highlight = state.getHighlightIndex();
+
+        for (int i = 0; i < state.getCapacity(); i++) {
+            double x = startX + i * (slotWidth + gap);
+            double y = startY;
+
+            if (x + slotWidth > paneWidth - 10) {
+                int columns = Math.max(1, (int) ((paneWidth - 40) / (slotWidth + gap)));
+                int row = i / columns;
+                int col = i % columns;
+                x = startX + col * (slotWidth + gap);
+                y = startY + row * 95;
+            }
+
+            Color fill = i == highlight ? Color.LIGHTCORAL : Color.WHITE;
+            Rectangle slot = new Rectangle(x, y, slotWidth, slotHeight);
+            slot.setFill(fill);
+            slot.setStroke(Color.BLACK);
+            renderPane.getChildren().add(slot);
+
+            Label indexLabel = new Label(Integer.toString(i));
+            indexLabel.relocate(x + 4, y - 24);
+            renderPane.getChildren().add(indexLabel);
+
+            Integer value = state.get(i);
+            Label valueLabel = new Label(value == null ? "empty" : value.toString());
+            valueLabel.relocate(x + 10, y + 22);
+            renderPane.getChildren().add(valueLabel);
+
+            if (value != null) {
+                Label hashLabel = new Label("h=" + state.hash(value));
+                hashLabel.relocate(x + 8, y + slotHeight + 4);
+                renderPane.getChildren().add(hashLabel);
+            }
+        }
+
+        lblStepCount.setText("Steps: " + hashRunner.getIndex() + " / " + hashRunner.getTotalSteps());
+        lblComparisons.setText("Comparisons: " + state.getCounters().getComparisons());
+        lblSwaps.setText("Swaps: 0");
+        lblWrites.setText("Writes: " + state.getCounters().getWrites());
+        String status = HashUtils.isValidLinearProbingTable(state.getTable()) ? "Valid Linear Probing Table" : "Invalid Linear Probing Table";
+        lblStatus.setText(status + " | Load Factor: " + String.format("%.2f", state.getLoadFactor()));
     }
 
     private void renderBst(BstState state) {
@@ -517,24 +624,57 @@ public void onNext() {
         }
         else if (optionSelected.equals("Heap")) {
             int[] data = new Random().ints(1, 100).distinct().limit(arraySize).toArray();
-            HeapState temp = new HeapState(data);
+            boolean minHeap = isSelectedMinHeap();
+            HeapState temp = new HeapState(data, minHeap);
             StepGenerator<HeapState> generator = getSelectedHeapGenerator();
-            if (algoSelected.equals("Heap Insert")) {
+            if (algoSelected.endsWith("Insert")) {
                 generator.setKeyToInsert(new Random().nextInt(99) + 1);
             }
             List<Step<HeapState>> steps = generator.generate(temp);
-            heapRunner = new StepRunner<HeapState>(data, steps, HeapState::new);
+            heapRunner = new StepRunner<HeapState>(data, steps, initialData -> new HeapState(initialData, minHeap));
+        }
+        else if (optionSelected.equals("Hash Table")) {
+            int capacity = 11;
+            List<Integer> keys = new Random().ints(1, 100).distinct().limit(5).boxed().toList();
+            HashInitializeGenerator generator = new HashInitializeGenerator();
+            generator.setKeysToInsert(keys);
+            List<Step<HashState>> steps = generator.generate(new HashState(capacity));
+            hashRunner = new StepRunner<HashState>(new int[]{capacity}, steps, data -> new HashState(data[0]));
         }
         render();
     }
 
     private StepGenerator<HeapState> getSelectedHeapGenerator() {
         String selected = cmbAlgorithm.getValue();
+        boolean minHeap = isSelectedMinHeap();
 
-        if (selected.equals("Heap Extract")) {
-            return new HeapExtractGenerator();
+        if (selected.endsWith("Extract")) {
+            return new HeapExtractGenerator(minHeap);
         }
-        return new HeapInsertGenerator();
+        return new HeapInsertGenerator(minHeap);
+    }
+
+    private boolean isSelectedMinHeap() {
+        String selected = cmbAlgorithm.getValue();
+        return selected != null && selected.startsWith("Min");
+    }
+
+    private boolean isValidSelectedHeap(HeapState state) {
+        if (state.isMinHeap()) {
+            return HeapUtils.isValidMinHeap(state.getData(), state.getSize());
+        }
+        return HeapUtils.isValidMaxHeap(state.getData(), state.getSize());
+    }
+
+    private StepGenerator<HashState> getSelectedHashGenerator() {
+        String selected = cmbAlgorithm.getValue();
+
+        return switch (selected) {
+            case "Create" -> new HashInitializeGenerator();
+            case "Search" -> new HashSearchGenerator();
+            case "Insert" -> new HashInsertGenerator();
+            default -> new HashInsertGenerator();
+        };
     }
 
     private StepGenerator<ArrayState> getSelectedArrayGenerator() {
@@ -610,12 +750,24 @@ private StepGenerator<BstState> getSelectedTreeGenerator() {
         try {
             int key = Integer.parseInt(inputTXTField.getText());
             if (optionSelected.equals("Heap")) {
-                HeapInsertGenerator generator = new HeapInsertGenerator();
+                boolean minHeap = isSelectedMinHeap();
+                HeapInsertGenerator generator = new HeapInsertGenerator(minHeap);
                 generator.setKeyToInsert(key);
-                HeapState current = heapRunner == null ? new HeapState(10) : heapRunner.getState();
+                HeapState current = heapRunner == null ? new HeapState(new int[]{}, minHeap) : heapRunner.getState();
                 int[] baseData = Arrays.copyOf(current.getData(), current.getSize());
                 List<Step<HeapState>> steps = generator.generate(current);
-                heapRunner = new StepRunner<HeapState>(baseData, steps, HeapState::new);
+                heapRunner = new StepRunner<HeapState>(baseData, steps, initialData -> new HeapState(initialData, minHeap));
+                render();
+                return;
+            }
+
+            if (optionSelected.equals("Hash Table")) {
+                HashState current = hashRunner == null ? new HashState(11) : hashRunner.getState();
+                Integer[] tableBefore = Arrays.copyOf(current.getTable(), current.getCapacity());
+                StepGenerator<HashState> generator = getSelectedHashGenerator();
+                generator.setKeyToInsert(key);
+                List<Step<HashState>> steps = generator.generate(current);
+                hashRunner = new StepRunner<HashState>(new int[]{current.getCapacity()}, steps, data -> new HashState(tableBefore));
                 render();
                 return;
             }
