@@ -88,10 +88,5 @@ public class HeapSortGenerator implements StepGenerator<ArrayState> {
         HeapSortGenerator heapSortGenerator = new HeapSortGenerator();
         heapSortGenerator.generate(arrayState);
         System.out.println(Arrays.toString(heapSortGenerator.work));
-
-//        List<Step> out = new ArrayList<>();
-//        int[] sortedArr = heapify(arr, out);
-//
-//        System.out.println(Arrays.toString(sortedArr));
     }
 }

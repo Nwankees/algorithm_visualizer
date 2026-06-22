@@ -36,20 +36,18 @@ public List<Step<BstState>> generate(BstState initialState) {
 
         if (keyToInsert < current.getKey()) {
             if (current.getBstNodeLeft() == null) {
-                // DO NOT mutate current.setBstNodeLeft here!
                 steps.add(new TreeInsertStep(keyToInsert));
                 return steps;
             }
             current = current.getBstNodeLeft();
         } else if (keyToInsert > current.getKey()) {
             if (current.getBstNodeRight() == null) {
-                // DO NOT mutate here!
                 steps.add(new TreeInsertStep(keyToInsert));
                 return steps;
             }
             current = current.getBstNodeRight();
         } else {
-            return steps; // Handle duplicate key (do nothing)
+            return steps; // Handle duplicate key
         }
     }
 }

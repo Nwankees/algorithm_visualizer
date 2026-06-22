@@ -119,6 +119,7 @@ public void changeOptionSelected() {
         inputTXTField.setPromptText("Enter number to " + algoSelected);
         submitTxtField.setText(algoSelected);
     }
+    onLoad();
 }
 
     public void changeAlgoSelected() {
@@ -152,6 +153,7 @@ public void changeOptionSelected() {
             inputTXTField.setVisible(false);
             submitTxtField.setVisible(false);
         }
+        onLoad();
     }
 
     public void onLoad() {
@@ -159,7 +161,7 @@ public void changeOptionSelected() {
         if (timeline != null) timeline.stop(); // Stop any current playback
         this.lblStatus.setText("Not sorted");
         this.lblNoOps.setText("");
-        this.loadStructure(7);
+        this.loadStructure(40);
     }
 
     public void onReset() {
@@ -258,7 +260,7 @@ public void onNext() {
                     lblNoOps.setText(arrayRunner.getCurrentStep().getDescription());
                 }
                 else { lblNoOps.setText(""); }
-                System.out.println(arrayRunner.getCurrentStep().getDescription());
+//                System.out.println(arrayRunner.getCurrentStep().getDescription());
                 render();
                 if (!arrayRunner.hasNext()) {
                     if (StepRunner.isSorted(arrayRunner.getState().getData())) {
@@ -278,7 +280,7 @@ public void onNext() {
                 if (StepRunner.isValidBST(bstRunner.getState().getRoot())) {
                     lblNoOps.setText("Valid BST!");
                 }
-                System.out.println(bstRunner.getCurrentStep().getDescription());
+//                System.out.println(bstRunner.getCurrentStep().getDescription());
                 render();
             }
             break;
@@ -295,7 +297,7 @@ public void onNext() {
                 } else {
                     lblNoOps.setText("Heapifying...");
                 }
-                System.out.println(heapRunner.getCurrentStep().getDescription());
+//                System.out.println(heapRunner.getCurrentStep().getDescription());
                 render();
             }
             break;
@@ -308,7 +310,7 @@ public void onNext() {
             if (hashRunner.hasNext()) {
                 hashRunner.next();
                 lblNoOps.setText(hashRunner.getCurrentStep().getDescription());
-                System.out.println(hashRunner.getCurrentStep().getDescription());
+//                System.out.println(hashRunner.getCurrentStep().getDescription());
                 render();
             }
             break;
@@ -349,15 +351,19 @@ public void onNext() {
     public void drawRectangle(double x, double y, double width, double height, Color color, Pane drawingPane) {
         Rectangle rectangle = new Rectangle(x, y, width, height);
         rectangle.setFill(color);
+        rectangle.setStroke(Color.web("#d8dee9"));
+        rectangle.setArcWidth(4);
+        rectangle.setArcHeight(4);
         drawingPane.getChildren().add(rectangle);
     }
 
     private void render() {
-        System.out.println(optionSelected);
+//        System.out.println(optionSelected);
 
         renderPane.getChildren().clear();
 
         if (optionSelected.equals("Array")) {
+            lblStatus.setVisible(true);
             ArrayState state = arrayRunner.getState();
             double paneWidth = renderPane.getWidth();
             double paneHeight = renderPane.getHeight();
@@ -380,12 +386,12 @@ public void onNext() {
                 double height = (state.get(i) / maxValue) * paneHeight;
                 double y = paneHeight - height;
 
-                Color color = Color.BLACK;
+                Color color = Color.web("#2563eb");
 
                 if (i == a || i == b) {
-                    color = Color.RED;
+                    color = Color.web("#ef4444");
                 } else if (rStart != -1 && rEnd != -1 && i >= rStart && i <= rEnd) {
-                    color = Color.LIGHTCORAL;
+                    color = Color.web("#f59e0b");
                 }
 
                 drawRectangle(x, y, barWidth, height, color, renderPane);
@@ -394,12 +400,15 @@ public void onNext() {
             lblStepCount.setText("Steps: " + arrayRunner.getIndex() + " / " + arrayRunner.getTotalSteps());
         }
         else if (optionSelected.equals("Trees")) {
+            lblStatus.setVisible(false);
             renderBst(bstRunner.getState());
         }
         else if (optionSelected.equals("Heap")) {
+            lblStatus.setVisible(false);
             renderHeap(heapRunner.getState());
         }
         else if (optionSelected.equals("Hash Table")) {
+            lblStatus.setVisible(false);
             renderHash(hashRunner.getState());
         }
     }
@@ -442,22 +451,31 @@ public void onNext() {
 
             if (left < size) {
                 double[] childPos = positions.get(left);
-                renderPane.getChildren().add(new Line(parentPos[0], parentPos[1], childPos[0], childPos[1]));
+                Line line = new Line(parentPos[0], parentPos[1], childPos[0], childPos[1]);
+                line.setStroke(Color.web("#94a3b8"));
+                line.setStrokeWidth(2);
+                renderPane.getChildren().add(line);
             }
             if (right < size) {
                 double[] childPos = positions.get(right);
-                renderPane.getChildren().add(new Line(parentPos[0], parentPos[1], childPos[0], childPos[1]));
+                Line line = new Line(parentPos[0], parentPos[1], childPos[0], childPos[1]);
+                line.setStroke(Color.web("#94a3b8"));
+                line.setStrokeWidth(2);
+                renderPane.getChildren().add(line);
             }
         }
 
         for (int i = 0; i < size; i++) {
             double[] pos = positions.get(i);
-            Color color = (i == a || i == b) ? Color.RED : Color.BLACK;
+            Color color = (i == a || i == b) ? Color.web("#ef4444") : Color.web("#1e293b");
             Circle circle = new Circle(pos[0], pos[1], radius, color);
+            circle.setStroke(Color.WHITE);
+            circle.setStrokeWidth(2);
             renderPane.getChildren().add(circle);
 
             Label label = new Label(Integer.toString(state.get(i)));
             label.setTextFill(Color.WHITE);
+            label.setStyle("-fx-font-weight: 700;");
             label.relocate(pos[0] - 10, pos[1] - 9);
             renderPane.getChildren().add(label);
         }
@@ -494,23 +512,31 @@ public void onNext() {
                 y = startY + row * 95;
             }
 
-            Color fill = i == highlight ? Color.LIGHTCORAL : Color.WHITE;
+            Color fill = i == highlight ? Color.web("#fed7aa") : Color.WHITE;
             Rectangle slot = new Rectangle(x, y, slotWidth, slotHeight);
             slot.setFill(fill);
-            slot.setStroke(Color.BLACK);
+            slot.setStroke(i == highlight ? Color.web("#f97316") : Color.web("#cbd5e1"));
+            slot.setStrokeWidth(i == highlight ? 2 : 1);
+            slot.setArcWidth(8);
+            slot.setArcHeight(8);
             renderPane.getChildren().add(slot);
 
             Label indexLabel = new Label(Integer.toString(i));
+            indexLabel.setTextFill(Color.web("#64748b"));
+            indexLabel.setStyle("-fx-font-weight: 700;");
             indexLabel.relocate(x + 4, y - 24);
             renderPane.getChildren().add(indexLabel);
 
             Integer value = state.get(i);
             Label valueLabel = new Label(value == null ? "empty" : value.toString());
+            valueLabel.setTextFill(value == null ? Color.web("#94a3b8") : Color.web("#172033"));
+            valueLabel.setStyle("-fx-font-weight: 700;");
             valueLabel.relocate(x + 10, y + 22);
             renderPane.getChildren().add(valueLabel);
 
             if (value != null) {
                 Label hashLabel = new Label("h=" + state.hash(value));
+                hashLabel.setTextFill(Color.web("#475569"));
                 hashLabel.relocate(x + 8, y + slotHeight + 4);
                 renderPane.getChildren().add(hashLabel);
             }
@@ -525,7 +551,7 @@ public void onNext() {
     }
 
     private void renderBst(BstState state) {
-        System.out.println("RENDERING BST!!!");
+//        System.out.println("RENDERING BST!!!");
         renderPane.getChildren().clear();
 
         if (state.getRoot() == null) {
@@ -541,33 +567,38 @@ public void onNext() {
             if (current.getBstNodeLeft() != null) {
                 PositionedNode leftChild = helper.findPosition(current.getBstNodeLeft(), positionedNodes);
                 Line line = new Line(node.getX(), node.getY(), leftChild.getX(), leftChild.getY());
+                line.setStroke(Color.web("#94a3b8"));
+                line.setStrokeWidth(2);
                 renderPane.getChildren().add(line);
             }
             if (current.getBstNodeRight() != null) {
                 PositionedNode rightChild = helper.findPosition(current.getBstNodeRight(), positionedNodes);
                 Line line = new Line(node.getX(), node.getY(), rightChild.getX(), rightChild.getY());
+                line.setStroke(Color.web("#94a3b8"));
+                line.setStrokeWidth(2);
                 renderPane.getChildren().add(line);
             }
         }
 
         int radius = 20;
-        Color defaultColor = Color.BLACK;
-        Color highlightColor = Color.RED;
+        Color defaultColor = Color.web("#1e293b");
+        Color highlightColor = Color.web("#ef4444");
         for (PositionedNode node : positionedNodes) {
             Circle circle = new Circle(node.getX(), node.getY(), radius, defaultColor);
             if (state.getHighlightKey() != null && node.getNode().getKey() == state.getHighlightKey()) {
                 circle.setFill(highlightColor);
             }
+            circle.setStroke(Color.WHITE);
+            circle.setStrokeWidth(2);
             renderPane.getChildren().add(circle);
-//            Label label = new Label(Integer.toString(node.getNode().getKey()));
-            int bf = util.Trees.AvlUtils.getBalance(node.getNode());
-            Label label = new Label(node.getNode().getKey() + "(" + bf + ")");
-            label.relocate(node.getX(), node.getY());
+            Label label = new Label(Integer.toString(node.getNode().getKey()));
+            label.relocate(node.getX() - 2, node.getY() - 2);
             label.setTextFill(Color.WHITE);
+            label.setStyle("-fx-font-weight: 700;");
             renderPane.getChildren().add(label);
-            System.out.println("Rendered circle for "+ node.getNode().getKey() + " at (x,y): " + circle.getCenterX() + ", " + circle.getCenterY());
-            System.out.println("Rendered circle's node's (x,y): " + node.getX() + ", " + node.getY());
-            System.out.println("Panel width: " + renderPane.getWidth());
+//            System.out.println("Rendered circle for "+ node.getNode().getKey() + " at (x,y): " + circle.getCenterX() + ", " + circle.getCenterY());
+//            System.out.println("Rendered circle's node's (x,y): " + node.getX() + ", " + node.getY());
+//            System.out.println("Panel width: " + renderPane.getWidth());
         }
 
         lblStepCount.setText("Steps: " + bstRunner.getIndex() + " / " + bstRunner.getTotalSteps());
@@ -596,7 +627,6 @@ public void onNext() {
     }
 
     private void loadStructure(int arraySize) {
-//        String optionSelected = this.cmbViewMode.getSelectionModel().getSelectedItem();
         if (optionSelected.equals("Array")) {
             int[] data = new Random().ints(arraySize, 1, 10000).toArray();
             ArrayState temp = new ArrayState(data);
@@ -605,7 +635,8 @@ public void onNext() {
             arrayRunner = new StepRunner<ArrayState>(data, steps, ArrayState::new);
         }
         else if (optionSelected.equals("Trees")) {
-            int[] data = new Random().ints(1, 100).distinct().limit(arraySize).toArray();
+            int treeCapacity = 20;
+            int[] data = new Random().ints(1, 100).distinct().limit(treeCapacity).toArray();
             currentTreeKeys = new ArrayList<>(); // Reset history
             for(int d : data) currentTreeKeys.add(d); // Seed with initial data
 
@@ -634,8 +665,8 @@ public void onNext() {
             heapRunner = new StepRunner<HeapState>(data, steps, initialData -> new HeapState(initialData, minHeap));
         }
         else if (optionSelected.equals("Hash Table")) {
-            int capacity = 11;
-            List<Integer> keys = new Random().ints(1, 100).distinct().limit(5).boxed().toList();
+            int capacity = 13;
+            List<Integer> keys = new Random().ints(1, 100).distinct().limit(capacity - 2).boxed().toList();
             HashInitializeGenerator generator = new HashInitializeGenerator();
             generator.setKeysToInsert(keys);
             List<Step<HashState>> steps = generator.generate(new HashState(capacity));
@@ -679,7 +710,6 @@ public void onNext() {
 
     private StepGenerator<ArrayState> getSelectedArrayGenerator() {
         String selected = cmbAlgorithm.getValue();
-//        String optionSelected = this.cmbViewMode.getSelectionModel().getSelectedItem();
 
         if (selected.equals("Merge Sort")) {
             return new MergeSortGenerator();
@@ -798,7 +828,8 @@ private StepGenerator<BstState> getSelectedTreeGenerator() {
 
             render();
         } catch (NumberFormatException e) {
-            System.out.println("Please enter a valid number.");
+//            System.out.println("Please enter a valid number.");
+            lblNoOps.setText("Error: Please enter a valid number.");
         }
     }
 }

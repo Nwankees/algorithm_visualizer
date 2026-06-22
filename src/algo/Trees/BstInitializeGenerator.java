@@ -16,10 +16,6 @@ public class BstInitializeGenerator implements StepGenerator<BstState> {
     private BstNode rootCopy;
     private List<Integer> keysToInsert;
 
-//    public BstInsertGenerator(List<Integer> keysToInsert) {
-//        this.keysToInsert = keysToInsert;
-//    }
-
     @Override
     public void setKeysToInsert(List<Integer> keysToInsert) {
         this.keysToInsert = keysToInsert;

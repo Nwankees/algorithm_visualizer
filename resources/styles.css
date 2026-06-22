@@ -1,0 +1,105 @@
+.app-root {
+    -fx-background-color: #f5f7fb;
+    -fx-font-family: "Segoe UI", "Inter", "Arial";
+    -fx-font-size: 13px;
+}
+
+.top-bar {
+    -fx-background-color: #ffffff;
+    -fx-border-color: transparent transparent #d8dee9 transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.app-title {
+    -fx-font-size: 22px;
+    -fx-font-weight: 700;
+    -fx-text-fill: #172033;
+}
+
+.app-subtitle {
+    -fx-text-fill: #667085;
+    -fx-padding: 5 0 0 4;
+}
+
+.control-row {
+    -fx-padding: 2 0 0 0;
+}
+
+.button {
+    -fx-background-color: #eef2f7;
+    -fx-border-color: #d2d9e5;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-text-fill: #243044;
+    -fx-font-weight: 600;
+    -fx-padding: 8 13 8 13;
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-background-color: #e3e9f2;
+}
+
+.primary-button {
+    -fx-background-color: #2563eb;
+    -fx-border-color: #1d4ed8;
+    -fx-text-fill: white;
+}
+
+.primary-button:hover {
+    -fx-background-color: #1d4ed8;
+}
+
+.combo-box,
+.text-field {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #cbd5e1;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-padding: 3 6 3 6;
+}
+
+.side-panel {
+    -fx-background-color: #ffffff;
+    -fx-border-color: transparent transparent transparent #d8dee9;
+    -fx-border-width: 0 0 0 1;
+}
+
+.panel-title {
+    -fx-font-size: 15px;
+    -fx-font-weight: 700;
+    -fx-text-fill: #172033;
+}
+
+.metric-label {
+    -fx-background-color: #f8fafc;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-padding: 8 10 8 10;
+    -fx-text-fill: #344054;
+    -fx-font-weight: 600;
+}
+
+.status-label {
+    -fx-background-color: #ecfdf5;
+    -fx-border-color: #a7f3d0;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-padding: 9 10 9 10;
+    -fx-text-fill: #065f46;
+    -fx-font-weight: 700;
+}
+
+.event-label {
+    -fx-background-color: #fff7ed;
+    -fx-border-color: #fed7aa;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-padding: 9 10 9 10;
+    -fx-text-fill: #9a3412;
+}
+
+.render-pane {
+    -fx-background-color: linear-gradient(to bottom, #f8fafc, #edf2f7);
+}

@@ -26,15 +26,12 @@ public class Main extends Application {
             Parent root = rootLoader.load();
             mainController = rootLoader.getController();
 
-            // Roots
-
-            // Controllers
 
             // Scenes
             scene = new Scene(root);
 
-//            String css = this.getClass().getResource("/styles.css").toExternalForm();
-//            scene.getStylesheets().add(css); add whenever you create the css
+            String css = this.getClass().getResource("/styles.css").toExternalForm();
+            scene.getStylesheets().add(css);
 
             mainStage.setScene(scene);
             mainStage.setTitle("Algorithm Visualizer");
